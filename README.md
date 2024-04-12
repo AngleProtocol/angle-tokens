@@ -1,66 +1,165 @@
-## Foundry
+# <img src=".github/assets/logo.svg" alt="Angle" height="40px"> Angle Tokens
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+[![CI](https://github.com/AngleProtocol/boilerplate/actions/workflows/ci.yml/badge.svg)](https://github.com/AngleProtocol/boilerplate/actions)
 
-Foundry consists of:
+This repository contains all the contracts of the Angle Tokens with associated contracts (CoreBorrow, FlashAngle ...)
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+## Starting
 
-## Documentation
+### Install packages
 
-https://book.getfoundry.sh/
+You can install all dependencies by running
 
-## Usage
-
-### Build
-
-```shell
-$ forge build
+```bash
+yarn
+forge i
 ```
 
-### Test
+### Create `.env` file
 
-```shell
-$ forge test
+In order to interact with non local networks, you must create an `.env` that has:
+
+- `PRIVATE_KEY`
+- `MNEMONIC`
+- network key (eg. `ALCHEMY_NETWORK_KEY`)
+- `ETHERSCAN_API_KEY`
+
+For additional keys, you can check the `.env.example` file.
+
+Warning: always keep your confidential information safe.
+
+## Headers
+
+To automatically create headers, follow: <https://github.com/Picodes/headers>
+
+## Hardhat Command line completion
+
+Follow these instructions to have hardhat command line arguments completion: <https://hardhat.org/hardhat-runner/docs/guides/command-line-completion>
+
+## Foundry Installation
+
+```bash
+curl -L https://foundry.paradigm.xyz | bash
+
+source /root/.zshrc
+# or, if you're under bash: source /root/.bashrc
+
+foundryup
 ```
 
-### Format
+To install the standard library:
 
-```shell
-$ forge fmt
+```bash
+forge install foundry-rs/forge-std
 ```
 
-### Gas Snapshots
+To update libraries:
 
-```shell
-$ forge snapshot
+```bash
+forge update
 ```
 
-### Anvil
+### Foundry on Docker 🐳
 
-```shell
-$ anvil
+**If you don’t want to install Rust and Foundry on your computer, you can use Docker**
+Image is available here [ghcr.io/foundry-rs/foundry](http://ghcr.io/foundry-rs/foundry).
+
+```bash
+docker pull ghcr.io/foundry-rs/foundry
+docker tag ghcr.io/foundry-rs/foundry:latest foundry:latest
 ```
 
-### Deploy
+To run the container:
 
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
+```bash
+docker run -it --rm -v $(pwd):/app -w /app foundry sh
 ```
 
-### Cast
+Then you are inside the container and can run Foundry’s commands.
 
-```shell
-$ cast <subcommand>
+### Tests
+
+You can run tests as follows:
+
+```bash
+forge test -vvvv --watch
+forge test -vvvv --match-path contracts/forge-tests/KeeperMulticall.t.sol
+forge test -vvvv --match-test "testAbc*"
+forge test -vvvv --fork-url https://eth-mainnet.alchemyapi.io/v2/Lc7oIGYeL_QvInzI0Wiu_pOZZDEKBrdf
 ```
 
-### Help
+You can also list tests:
 
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
+```bash
+forge test --list
+forge test --list --json --match-test "testXXX*"
 ```
+
+### Deploying
+
+There is an example script in the `scripts/foundry` folder. Then you can run:
+
+```bash
+yarn foundry:deploy <FILE_NAME> --rpc-url <NETWORK_NAME>
+```
+
+Example:
+
+```bash
+yarn foundry:deploy scripts/foundry/DeployMockAgEUR.s.sol --rpc-url goerli
+```
+
+### Coverage
+
+We recommend the use of this [vscode extension](ryanluker.vscode-coverage-gutters).
+
+```bash
+yarn hardhat:coverage
+yarn foundry:coverage
+```
+
+### Simulate
+
+You can simulate your transaction live or in fork mode. For both option you need to
+complete the `scripts/foundry/Simulate.s.sol` with your values: address sending the tx,
+address caled and the data to give to this address call.
+
+For live simulation
+
+```bash
+yarn foundry:simulate
+```
+
+For fork simulation
+
+```bash
+yarn foundry:fork
+yarn foundry:simulate:fork
+```
+
+For fork simulation at a given block
+
+```bash
+yarn foundry:fork:block ${XXXX}
+yarn foundry:simulate:fork
+```
+
+### Gas report
+
+```bash
+yarn foundry:gas
+```
+
+## Slither
+
+```bash
+pip3 install slither-analyzer
+pip3 install solc-select
+solc-select install 0.8.11
+solc-select use 0.8.11
+slither .
+```
+
+## Media
+
+Don't hesitate to reach out on [Twitter](https://twitter.com/AngleProtocol) 🐦
