@@ -36,6 +36,11 @@ interface IAgToken is IERC20Upgradeable {
     /// requested to do so by an address willing to burn tokens from its address
     function burnSelf(uint256 amount, address burner) external;
 
+    /// @notice Allows anyone to burn stablecoins
+    /// @param amount Amount of stablecoins to burn
+    /// @dev This function can typically be called if there is a settlement mechanism to burn stablecoins
+    function burnStablecoin(uint256 amount) external;
+
     // ========================= Treasury Only Functions ===========================
 
     /// @notice Adds a minter in the contract
