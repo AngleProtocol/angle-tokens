@@ -54,8 +54,8 @@ jobs:
         with:
           registry-token: ${{ secrets.GH_REGISTRY_ACCESS_TOKEN }}
 
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
+      - name: Install foundry dependencies
+        run: forge install
 
       - name: Compile foundry
         run: yarn compile --sizes
