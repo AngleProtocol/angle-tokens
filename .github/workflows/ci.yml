@@ -1,11 +1,14 @@
-name: 'CI'
+name: "CI"
+
+env:
+  FOUNDRY_PROFILE: "ci"
 
 on:
   workflow_dispatch:
   pull_request:
   push:
     branches:
-      - 'main'
+      - "main"
 
 jobs:
   lint:
@@ -16,7 +19,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: 'yarn'
+          cache: "yarn"
 
       - name: Setup repo
         uses: ./.github/actions/setup-repo
@@ -29,21 +32,22 @@ jobs:
       - name: Run solhint
         run: yarn lint:check
 
-      - name: 'Add lint summary'
+      - name: "Add lint summary"
         run: |
           echo "## Lint result" >> $GITHUB_STEP_SUMMARY
           echo "✅ Passed" >> $GITHUB_STEP_SUMMARY
+
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
-          submodules: 'recursive'
+          submodules: "recursive"
 
-      - uses: actions/setup-node@v3
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
         with:
-          node-version: 18
-          cache: 'yarn'
+          version: nightly
 
       - name: Setup repo
         uses: ./.github/actions/setup-repo
@@ -53,133 +57,169 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Compile hardhat
-        run: yarn hardhat:compile
-
-      - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
-        with:
-          version: nightly
-
       - name: Compile foundry
-        run: yarn foundry:compile --sizes
+        run: yarn compile --sizes
 
-      - name: 'Cache the build so that it can be re-used by the other jobs'
-        uses: 'actions/cache/save@v3'
+      - name: "Cache the build so that it can be re-used by the other jobs"
+        uses: "actions/cache/save@v3"
         with:
-          key: 'build-${{ github.sha }}'
+          key: "build-${{ github.sha }}"
           path: |
             cache-forge
             out
-            cache-hh
-            artifacts
-            typechain
             node_modules
-      - name: 'Add build summary'
+
+      - name: "Add build summary"
         run: |
           echo "## Build result" >> $GITHUB_STEP_SUMMARY
           echo "✅ Passed" >> $GITHUB_STEP_SUMMARY
 
-  hardhat-tests:
-    needs: ['build', 'lint']
+  test-unit:
+    needs: ["build", "lint"]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-
-      - uses: actions/setup-node@v3
         with:
-          node-version: 18
-          cache: 'yarn'
+          submodules: "recursive"
 
-      - name: 'Restore the cached build'
-        uses: 'actions/cache/restore@v3'
+      - uses: actions/cache/restore@v3
         with:
           fail-on-cache-miss: true
-          key: 'build-${{ github.sha }}'
           path: |
             cache-forge
             out
-            cache-hh
-            artifacts
-            typechain
             node_modules
-      - run: export NODE_OPTIONS=--max_old_space_size=11264
-      - name: Run unit tests
-        run: yarn hardhat:test
-        env:
-          ENABLE_GAS_REPORT: true
-          CI: true
-          ETH_NODE_URI_POLYGON: ${{ secrets.ETH_NODE_URI_POLYGON }}
-          ETH_NODE_URI_FORK: ${{ secrets.ETH_NODE_URI_FORK }}
-          ETH_NODE_URI_MAINNET: ${{ secrets.ETH_NODE_URI_MAINNET }}
-
-      - name: 'Add test summary'
-        run: |
-          echo "## Hardhat Unit tests result" >> $GITHUB_STEP_SUMMARY
-          echo "✅ Passed" >> $GITHUB_STEP_SUMMARY
-
-  foundry-tests:
-    needs: ['build', 'lint']
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: 'recursive'
+          key: "build-${{ github.sha }}"
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
           version: nightly
 
-      - name: 'Restore the cached build'
-        uses: 'actions/cache/restore@v3'
+      - name: Run Foundry tests
+        run: yarn test:unit
+        env:
+          ETH_NODE_URI_POLYGON: ${{ secrets.ETH_NODE_URI_POLYGON }}
+          ETH_NODE_URI_ARBITRUM: ${{ secrets.ETH_NODE_URI_ARBITRUM }}
+          ETH_NODE_URI_OPTIMISM: ${{ secrets.ETH_NODE_URI_OPTIMISM }}
+          ETH_NODE_URI_MAINNET: ${{ secrets.ETH_NODE_URI_MAINNET }}
+
+  test-invariant:
+    needs: ["build", "lint"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: "recursive"
+
+      - uses: actions/cache/restore@v3
         with:
           fail-on-cache-miss: true
-          key: 'build-${{ github.sha }}'
           path: |
             cache-forge
             out
-            cache-hh
-            artifacts
-            typechain
             node_modules
-      - name: Run Foundry tests
-        run: yarn foundry:test
-        env:
-          ETH_NODE_URI_MAINNET: ${{ secrets.ETH_NODE_URI_MAINNET }}
-          ETH_NODE_URI_POLYGON: ${{ secrets.ETH_NODE_URI_POLYGON }}
-          ETH_NODE_URI_GOERLI: ${{ secrets.ETH_NODE_URI_GOERLI }}
-          ETH_NODE_URI_FANTOM: ${{ secrets.ETH_NODE_URI_FANTOM }}
-          FOUNDRY_FUZZ_RUNS: '5000'
+          key: "build-${{ github.sha }}"
 
-      - name: 'Add test summary'
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Run Foundry tests
+        run: yarn test:invariant
+        env:
+          FOUNDRY_INVARIANT_RUNS: "8"
+          FOUNDRY_INVARIANT_DEPTH: "256"
+          ETH_NODE_URI_POLYGON: ${{ secrets.ETH_NODE_URI_POLYGON }}
+          ETH_NODE_URI_ARBITRUM: ${{ secrets.ETH_NODE_URI_ARBITRUM }}
+          ETH_NODE_URI_OPTIMISM: ${{ secrets.ETH_NODE_URI_OPTIMISM }}
+          ETH_NODE_URI_MAINNET: ${{ secrets.ETH_NODE_URI_MAINNET }}
+
+  test-fuzz:
+    needs: ["build", "lint"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: "recursive"
+
+      - uses: actions/cache/restore@v3
+        with:
+          fail-on-cache-miss: true
+          path: |
+            cache-forge
+            out
+            node_modules
+          key: "build-${{ github.sha }}"
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Run Foundry tests
+        run: yarn test:fuzz
+        env:
+          FOUNDRY_FUZZ_RUNS: "5000"
+          ETH_NODE_URI_POLYGON: ${{ secrets.ETH_NODE_URI_POLYGON }}
+          ETH_NODE_URI_ARBITRUM: ${{ secrets.ETH_NODE_URI_ARBITRUM }}
+          ETH_NODE_URI_OPTIMISM: ${{ secrets.ETH_NODE_URI_OPTIMISM }}
+          ETH_NODE_URI_MAINNET: ${{ secrets.ETH_NODE_URI_MAINNET }}
+
+  coverage:
+    needs: ["build", "lint"]
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: "recursive"
+
+      - uses: actions/cache/restore@v3
+        with:
+          fail-on-cache-miss: true
+          path: |
+            cache-forge
+            out
+            node_modules
+          key: "build-${{ github.sha }}"
+
+      - name: "Install Foundry"
+        uses: "foundry-rs/foundry-toolchain@v1"
+
+      - name: "Install lcov"
+        run: "sudo apt-get install lcov"
+
+      - name: "Generate the coverage report using the unit and the integration tests"
+        run: "yarn ci:coverage"
+        env:
+          ETH_NODE_URI_POLYGON: ${{ secrets.ETH_NODE_URI_POLYGON }}
+          ETH_NODE_URI_ARBITRUM: ${{ secrets.ETH_NODE_URI_ARBITRUM }}
+          ETH_NODE_URI_OPTIMISM: ${{ secrets.ETH_NODE_URI_OPTIMISM }}
+          ETH_NODE_URI_MAINNET: ${{ secrets.ETH_NODE_URI_MAINNET }}
+
+      - name: "Upload coverage report to Codecov"
+        uses: "codecov/codecov-action@v3"
+        with:
+          files: "./lcov.info"
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: "Add coverage summary"
         run: |
-          echo "## Foundry Unit tests result" >> $GITHUB_STEP_SUMMARY
-          echo "✅ Passed" >> $GITHUB_STEP_SUMMARY
+          echo "## Coverage result" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Uploaded to Codecov" >> $GITHUB_STEP_SUMMARY
 
   slither-analyze:
-    needs: ['build', 'lint']
+    needs: ["build", "lint"]
+    runs-on: "ubuntu-latest"
     permissions:
-      actions: 'read'
-      contents: 'read'
-      security-events: 'write'
-    runs-on: 'ubuntu-latest'
+      actions: "read"
+      contents: "read"
+      security-events: "write"
     steps:
-      - name: 'Check out the repo'
-        uses: 'actions/checkout@v3'
-
-      - name: 'Restore the cached build'
-        uses: 'actions/cache/restore@v3'
+      - uses: actions/checkout@v3
         with:
-          fail-on-cache-miss: true
-          key: 'build-${{ github.sha }}'
-          path: |
-            cache-forge
-            out
-            cache-hh
-            artifacts
-            typechain
-            node_modules
+          submodules: "recursive"
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
@@ -189,21 +229,20 @@ jobs:
       - name: Compile foundry
         run: forge clean && forge build --build-info --force
 
-      - name: 'Run Slither analysis'
-        uses: 'crytic/slither-action@v0.3.0'
-        id: 'slither'
+      - name: "Run Slither analysis"
+        uses: "crytic/slither-action@v0.3.2"
+        id: "slither"
         with:
-          fail-on: 'none'
-          sarif: 'results.sarif'
-          node-version: 18
           ignore-compile: true
+          fail-on: "none"
+          sarif: "results.sarif"
 
-      - name: 'Upload SARIF file to GitHub code scanning'
-        uses: 'github/codeql-action/upload-sarif@v2'
+      - name: "Upload SARIF file to GitHub code scanning"
+        uses: "github/codeql-action/upload-sarif@v2"
         with:
           sarif_file: ${{ steps.slither.outputs.sarif }}
 
-      - name: 'Add Slither summary'
+      - name: "Add Slither summary"
         run: |
           echo "## Slither result" >> $GITHUB_STEP_SUMMARY
           echo "✅ Uploaded to GitHub code scanning" >> $GITHUB_STEP_SUMMARY
