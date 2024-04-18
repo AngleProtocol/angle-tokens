@@ -3,8 +3,8 @@ pragma solidity ^0.8.12;
 
 import "../../../contracts/external/ProxyAdmin.sol";
 import "../../../contracts/external/TransparentUpgradeableProxy.sol";
-import { CommonUtils } from "../../../lib/utils/src/CommonUtils.sol";
-import { ContractType } from "../../../lib/utils/src/Constants.sol";
+import { CommonUtils } from "utils/src/CommonUtils.sol";
+import { ContractType } from "utils/src/Constants.sol";
 
 contract MainnetConstants is CommonUtils {
     address constant GOVERNOR = 0xdC4e6DFe07EFCa50a197DF15D9200883eF4Eb1c8;
@@ -47,8 +47,4 @@ contract MainnetConstants is CommonUtils {
     uint256 constant LLTV_86 = 0.86 ether;
     uint256 constant LLTV_77 = 0.77 ether;
     uint256 constant LLTV_62 = 0.625 ether;
-
-    function deployUpgradeable(address implementation, bytes memory data) public returns (address) {
-        return address(new TransparentUpgradeableProxy(implementation, PROXY_ADMIN, data));
-    }
 }

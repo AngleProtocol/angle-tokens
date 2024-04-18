@@ -7,8 +7,9 @@ import "../../contracts/external/TransparentUpgradeableProxy.sol";
 import "../../contracts/mock/MockCoreBorrow.sol";
 import { Math } from "oz/utils/math/Math.sol";
 import { console } from "forge-std/console.sol";
+import { CommonUtils } from "utils/src/CommonUtils.sol";
 
-contract BaseTest is Test {
+contract BaseTest is Test, CommonUtils {
     ProxyAdmin public proxyAdmin;
     MockCoreBorrow public coreBorrow;
 
@@ -41,9 +42,5 @@ contract BaseTest is Test {
         vm.label(_bob, "Bob");
         vm.label(_charlie, "Charlie");
         vm.label(_dylan, "Dylan");
-    }
-
-    function deployUpgradeable(address implementation, bytes memory data) public returns (address) {
-        return address(new TransparentUpgradeableProxy(implementation, address(proxyAdmin), data));
     }
 }

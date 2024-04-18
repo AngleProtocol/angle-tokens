@@ -21,8 +21,4 @@ contract PolygonConstants {
 
     uint256 public constant BASE_TOKENS = 10 ** 18;
     uint64 public constant BASE_PARAMS = 10 ** 9;
-
-    function deployUpgradeable(address implementation, bytes memory data) public returns (address) {
-        return address(new TransparentUpgradeableProxy(implementation, PROXY_ADMIN_GUARDIAN, data));
-    }
 }

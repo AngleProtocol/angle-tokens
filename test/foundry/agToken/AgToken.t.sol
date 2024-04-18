@@ -3,9 +3,8 @@ pragma solidity ^0.8.17;
 
 import { stdStorage, StdStorage } from "forge-std/Test.sol";
 import "../BaseTest.test.sol";
-import "../../../contracts/mock/MockTreasury.sol";
-import { IAgToken, AgToken } from "../../../contracts/agToken/AgToken.sol";
-import { MockTreasury } from "../../../contracts/mock/MockTreasury.sol";
+import { IAgToken, AgToken } from "contracts/agToken/AgToken.sol";
+import { MockTreasury } from "contracts/mock/MockTreasury.sol";
 
 contract AgTokenTest is BaseTest {
     using stdStorage for StdStorage;
@@ -23,8 +22,7 @@ contract AgTokenTest is BaseTest {
         super.setUp();
 
         _agTokenImplem = new AgToken();
-        bytes memory emptyData;
-        _agToken = AgToken(deployUpgradeable(address(_agTokenImplem), emptyData));
+        _agToken = AgToken(_deployUpgradeable(address(proxyAdmin), address(_agTokenImplem), ""));
 
         _treasury = new MockTreasury(
             IAgToken(address(_agToken)),
@@ -71,7 +69,7 @@ contract AgTokenTest is BaseTest {
             address(0)
         );
         bytes memory emptyData;
-        _agToken = AgToken(deployUpgradeable(address(_agTokenImplem), emptyData));
+        _agToken = AgToken(_deployUpgradeable(address(proxyAdmin), address(_agTokenImplem), emptyData));
 
         vm.expectRevert(AgToken.InvalidTreasury.selector);
         _agToken.initialize(name2, symbol2, address(treasury));

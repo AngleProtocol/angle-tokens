@@ -38,7 +38,7 @@ contract FlashAngleTest is BaseTest {
         );
 
         _flashAngleImplem = new FlashAngle();
-        _flashAngle = FlashAngle(deployUpgradeable(address(_flashAngleImplem), ""));
+        _flashAngle = FlashAngle(_deployUpgradeable(address(proxyAdmin), address(_flashAngleImplem), ""));
         _flashAngle.initialize(ICoreBorrow(address(_coreBorrow)));
 
         _coreBorrow.addStablecoinSupport(IFlashAngle(address(_flashAngle)), address(_treasury));
