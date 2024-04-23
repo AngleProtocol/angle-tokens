@@ -101,17 +101,18 @@ interface IVaultManagerFunctions {
     /// @notice Accrues interest accumulated across all vaults to the surplus and sends the surplus to the treasury
     /// @return surplusValue Value of the surplus communicated to the `Treasury`
     /// @return badDebtValue Value of the bad debt communicated to the `Treasury`
-    /// @dev `surplus` and `badDebt` should be reset to 0 once their current value have been given to the `treasury` contract
+    /// @dev `surplus` and `badDebt` should be reset to 0 once their current value have been given to the
+    /// `treasury` contract
     function accrueInterestToTreasury() external returns (uint256 surplusValue, uint256 badDebtValue);
 
     /// @notice Removes debt from a vault after being requested to do so by another `VaultManager` contract
     /// @param vaultID ID of the vault to remove debt from
     /// @param amountStablecoins Amount of stablecoins to remove from the debt: this amount is to be converted to an
     /// internal debt amount
-    /// @param senderBorrowFee Borrowing fees from the contract which requested this: this is to make sure that people are not
-    /// arbitraging difference in minting fees
-    /// @param senderRepayFee Repay fees from the contract which requested this: this is to make sure that people are not arbitraging
-    /// differences in repay fees
+    /// @param senderBorrowFee Borrowing fees from the contract which requested this: this is to make sure that people
+    /// are not arbitraging difference in minting fees
+    /// @param senderRepayFee Repay fees from the contract which requested this: this is to make sure that people
+    /// are not arbitraging differences in repay fees
     /// @dev This function can only be called from a vaultManager registered in the same Treasury
     function getDebtOut(
         uint256 vaultID,
@@ -145,20 +146,23 @@ interface IVaultManagerFunctions {
     /// @notice Allows composability between calls to the different entry points of this module. Any user calling
     /// this function can perform any of the allowed actions in the order of their choice
     /// @param actions Set of actions to perform
-    /// @param datas Data to be decoded for each action: it can include like the `vaultID` or the `stablecoinAmount` to borrow
-    /// @param from Address from which stablecoins will be taken if one action includes burning stablecoins. This address
-    /// should either be the `msg.sender` or be approved by the latter
+    /// @param datas Data to be decoded for each action: it can include like the `vaultID` or the `stablecoinAmount`
+    /// to borrow
+    /// @param from Address from which stablecoins will be taken if one action includes burning stablecoins.
+    /// This address should either be the `msg.sender` or be approved by the latter
     /// @param to Address to which stablecoins and/or collateral will be sent in case of
     /// @param who Address of the contract to handle in case of repayment of stablecoins from received collateral
     /// @param repayData Data to pass to the repayment contract in case of
-    /// @return paymentData Struct containing the accounting changes from the protocol's perspective (like how much of collateral
-    /// or how much has been received). Note that the values in the struct are not aggregated and you could have in the output
-    /// a positive amount of stablecoins to receive as well as a positive amount of stablecoins to give
+    /// @return paymentData Struct containing the accounting changes from the protocol's perspective (like how much
+    /// of collateral or how much has been received). Note that the values in the struct are not aggregated and you
+    /// could have in the output a positive amount of stablecoins to receive as well as a positive amount of
+    /// stablecoins to give
     /// @dev This function is optimized to reduce gas cost due to payment from or to the user and that expensive calls
     /// or computations (like `oracleValue`) are done only once
-    /// @dev When specifying `vaultID` in `data`, it is important to know that if you specify `vaultID = 0`, it will simply
-    /// use the latest `vaultID`. This is the default behavior, and unless you're engaging into some complex protocol actions
-    /// it is encouraged to use `vaultID = 0` only when the first action of the batch is `createVault`
+    /// @dev When specifying `vaultID` in `data`, it is important to know that if you specify `vaultID = 0`,
+    /// it will simply use the latest `vaultID`. This is the default behavior, and unless you're engaging into some
+    /// complex protocol actions, it is encouraged to use `vaultID = 0` only when the first action of the
+    /// batch is `createVault`
     function angle(
         ActionType[] memory actions,
         bytes[] memory datas,
@@ -168,8 +172,8 @@ interface IVaultManagerFunctions {
         bytes memory repayData
     ) external returns (PaymentData memory paymentData);
 
-    /// @notice This function is a wrapper built on top of the function above. It enables users to interact with the contract
-    /// without having to provide `who` and `repayData` parameters
+    /// @notice This function is a wrapper built on top of the function above. It enables users to interact with
+    /// the contract without having to provide `who` and `repayData` parameters
     function angle(
         ActionType[] memory actions,
         bytes[] memory datas,
@@ -194,7 +198,8 @@ interface IVaultManagerFunctions {
         string memory _symbol
     ) external;
 
-    /// @notice Minimum amount of debt a vault can have, expressed in `BASE_TOKENS` that is to say the base of the agTokens
+    /// @notice Minimum amount of debt a vault can have, expressed in `BASE_TOKENS` that is to say the base
+    /// of the agTokens
     function dust() external view returns (uint256);
 
     /// @notice Pauses external permissionless functions of the contract
@@ -229,8 +234,8 @@ interface IVaultManagerStorage {
     /// @notice Reference to the collateral handled by this `VaultManager`
     function collateral() external view returns (IERC20);
 
-    /// @notice Total normalized amount of stablecoins borrowed, not taking into account the potential bad debt accumulated
-    /// This value is expressed in the base of Angle stablecoins (`BASE_TOKENS = 10**18`)
+    /// @notice Total normalized amount of stablecoins borrowed, not taking into account the potential
+    ///  bad debt accumulated. This value is expressed in the base of Angle stablecoins (`BASE_TOKENS = 10**18`)
     function totalNormalizedDebt() external view returns (uint256);
 
     /// @notice Maximum amount of stablecoins that can be issued with this contract. It is expressed in `BASE_TOKENS`

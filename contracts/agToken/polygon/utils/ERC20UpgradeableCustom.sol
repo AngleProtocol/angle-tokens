@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 // OpenZeppelin Contracts v4.4.1 (token/ERC20/ERC20.sol)
 
+// solhint-disable custom-errors
+
 pragma solidity ^0.8.0;
 
 import "oz-upgradeable/token/ERC20/IERC20Upgradeable.sol";

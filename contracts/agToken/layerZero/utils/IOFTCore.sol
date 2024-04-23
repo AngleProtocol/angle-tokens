@@ -12,7 +12,8 @@ import "oz/utils/introspection/IERC165.sol";
 interface IOFTCore is IERC165 {
     /// @notice Estimates send token `_tokenId` to (`_dstChainId`, `_toAddress`)
     /// @param _dstChainId L0 defined chain id to send tokens too
-    /// @param _toAddress dynamic bytes array which contains the address to whom you are sending tokens to on the dstChain
+    /// @param _toAddress dynamic bytes array which contains the address to whom you are sending
+    /// tokens to on the dstChain
     /// @param _amount amount of the tokens to transfer
     /// @param _useZro indicates to use zro to pay L0 fees
     /// @param _adapterParams flexible bytes array to indicate messaging adapter services in L0
@@ -106,6 +107,4 @@ interface IOFTCore is IERC165 {
 }
 
 /// @dev Interface of the OFT standard
-interface IOFT is IOFTCore, IERC20 {
-
-}
+interface IOFT is IOFTCore, IERC20 {}

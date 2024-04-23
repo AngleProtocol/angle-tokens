@@ -41,7 +41,7 @@ contract AgTokenSideChainMultiBridgeTest is BaseTest {
 
     // ================================= INITIALIZE ================================
 
-    function test_initialize_Constructor() public {
+    function test_initialize_Constructor() public view {
         (uint256 limit, uint256 hourlyLimit, uint64 fee, bool allowed, bool paused) = _agToken.bridges(
             address(_bridgeToken)
         );
@@ -98,7 +98,7 @@ contract AgTokenSideChainMultiBridgeTest is BaseTest {
 
     // ================================= AddBridgeToken ================================
 
-    function test_addBridgeToken_Normal() public {
+    function test_addBridgeToken_Normal() public view {
         (uint256 limit, uint256 hourlyLimit, uint64 fee, bool allowed, bool paused) = _agToken.bridges(
             address(_bridgeToken)
         );
@@ -241,9 +241,7 @@ contract AgTokenSideChainMultiBridgeTest is BaseTest {
     function test_setLimit_Normal() public {
         vm.prank(_GOVERNOR);
         _agToken.setLimit(address(_bridgeToken), 1000e18);
-        (uint256 limit, uint256 hourlyLimit, uint64 fee, bool allowed, bool paused) = _agToken.bridges(
-            address(_bridgeToken)
-        );
+        (uint256 limit, , , , ) = _agToken.bridges(address(_bridgeToken));
         assertEq(limit, 1000e18);
     }
 
@@ -264,9 +262,7 @@ contract AgTokenSideChainMultiBridgeTest is BaseTest {
     function test_setHourlyLimit_Normal() public {
         vm.prank(_GOVERNOR);
         _agToken.setHourlyLimit(address(_bridgeToken), 1000e18);
-        (uint256 limit, uint256 hourlyLimit, uint64 fee, bool allowed, bool paused) = _agToken.bridges(
-            address(_bridgeToken)
-        );
+        (, uint256 hourlyLimit, , , ) = _agToken.bridges(address(_bridgeToken));
         assertEq(hourlyLimit, 1000e18);
     }
 
@@ -307,9 +303,7 @@ contract AgTokenSideChainMultiBridgeTest is BaseTest {
     function test_setSwapFee_Normal() public {
         vm.prank(_GOVERNOR);
         _agToken.setSwapFee(address(_bridgeToken), 3e8);
-        (uint256 limit, uint256 hourlyLimit, uint64 fee, bool allowed, bool paused) = _agToken.bridges(
-            address(_bridgeToken)
-        );
+        (, , uint64 fee, , ) = _agToken.bridges(address(_bridgeToken));
         assertEq(fee, 3e8);
     }
 
@@ -330,9 +324,7 @@ contract AgTokenSideChainMultiBridgeTest is BaseTest {
     function test_toggleBridge_Paused() public {
         vm.prank(_GOVERNOR);
         _agToken.toggleBridge(address(_bridgeToken));
-        (uint256 limit, uint256 hourlyLimit, uint64 fee, bool allowed, bool paused) = _agToken.bridges(
-            address(_bridgeToken)
-        );
+        (, , , , bool paused) = _agToken.bridges(address(_bridgeToken));
         assertTrue(paused);
     }
 
@@ -341,9 +333,7 @@ contract AgTokenSideChainMultiBridgeTest is BaseTest {
         _agToken.toggleBridge(address(_bridgeToken));
         _agToken.toggleBridge(address(_bridgeToken));
         vm.stopPrank();
-        (uint256 limit, uint256 hourlyLimit, uint64 fee, bool allowed, bool paused) = _agToken.bridges(
-            address(_bridgeToken)
-        );
+        (, , , , bool paused) = _agToken.bridges(address(_bridgeToken));
         assertFalse(paused);
     }
 

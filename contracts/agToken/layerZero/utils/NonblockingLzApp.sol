@@ -81,7 +81,8 @@ abstract contract NonblockingLzApp is Initializable, ILayerZeroReceiver, ILayerZ
         if (msg.sender != address(lzEndpoint)) revert InvalidEndpoint();
 
         bytes memory trustedRemote = trustedRemoteLookup[_srcChainId];
-        // if will still block the message pathway from (srcChainId, srcAddress). should not receive message from untrusted remote.
+        // if will still block the message pathway from (srcChainId, srcAddress).
+        // should not receive message from untrusted remote.
         if (_srcAddress.length != trustedRemote.length || keccak256(_srcAddress) != keccak256(trustedRemote))
             revert InvalidSource();
 

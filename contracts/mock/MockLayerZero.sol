@@ -2,9 +2,7 @@
 
 pragma solidity ^0.8.12;
 
-interface ILzApp {
-    function lzReceive(uint16 _srcChainId, bytes memory _srcAddress, uint64 _nonce, bytes memory _payload) external;
-}
+import "layer-zero/interfaces/ILayerZeroReceiver.sol";
 
 contract MockLayerZero {
     mapping(uint16 => uint256) public counters;
@@ -43,7 +41,7 @@ contract MockLayerZero {
         uint64 _nonce,
         bytes memory _payload
     ) public {
-        ILzApp(lzApp).lzReceive(_srcChainId, _srcAddress, _nonce, _payload);
+        ILayerZeroReceiver(lzApp).lzReceive(_srcChainId, _srcAddress, _nonce, _payload);
     }
 
     function estimateFees(

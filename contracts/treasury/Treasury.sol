@@ -240,11 +240,11 @@ contract Treasury is ITreasury, Initializable {
     /// @param surplusBufferValue Value of the surplus buffer after the calls to the different modules
     /// @param badDebtValue Value of the bad debt after the calls to the different modules
     /// @return Value of the `surplusBuffer` corrected from the `badDebt`
-    /// @return Value of the `badDebt` corrected from the `surplusBuffer` and from the surplus the treasury had accumulated
-    /// previously
-    /// @dev When calling this function, it is possible that there is a positive `surplusBufferValue` and `badDebtValue`,
-    /// this function tries to reconcile both values and makes sure that we either have surplus or bad debt but not both
-    /// at the same time
+    /// @return Value of the `badDebt` corrected from the `surplusBuffer` and from the surplus the treasury
+    /// had accumulated previously
+    /// @dev When calling this function, it is possible that there is a positive `surplusBufferValue`
+    /// and `badDebtValue`, this function tries to reconcile both values and makes sure that we either have
+    /// surplus or bad debt but not both at the same time
     function _updateSurplusAndBadDebt(
         uint256 surplusBufferValue,
         uint256 badDebtValue

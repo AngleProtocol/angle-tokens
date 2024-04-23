@@ -9,8 +9,8 @@ import "oz/token/ERC20/utils/SafeERC20.sol";
 /// @title AgTokenSideChainMultiBridge
 /// @author Angle Labs, Inc.
 /// @notice Contract for Angle agTokens on other chains than Ethereum mainnet
-/// @dev This contract supports bridge tokens having a minting right on the stablecoin (also referred to as the canonical
-/// or the native token)
+/// @dev This contract supports bridge tokens having a minting right on the stablecoin
+/// (also referred to as the canonicalor the native token)
 contract AgTokenSideChainMultiBridge is AgToken {
     using SafeERC20 for IERC20;
 
