@@ -3,9 +3,9 @@
 pragma solidity ^0.8.12;
 
 import "oz-upgradeable/proxy/utils/Initializable.sol";
-import "../../../interfaces/external/layerZero/ILayerZeroReceiver.sol";
-import "../../../interfaces/external/layerZero/ILayerZeroUserApplicationConfig.sol";
-import "../../../interfaces/external/layerZero/ILayerZeroEndpoint.sol";
+import "layer-zero/interfaces/ILayerZeroReceiver.sol";
+import "layer-zero/interfaces/ILayerZeroUserApplicationConfig.sol";
+import "layer-zero/interfaces/ILayerZeroEndpoint.sol";
 import "../../../interfaces/ITreasury.sol";
 
 /// @title NonblockingLzApp

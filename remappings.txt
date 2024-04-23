@@ -5,4 +5,5 @@ oz-upgradeable/=lib/openzeppelin-contracts-upgradeable/contracts/
 chainlink/=lib/chainlink/contracts/
 utils/=lib/utils/
 contracts/=contracts/
-chainlink=lib/chainlink/contracts/
+chainlink/=lib/chainlink/contracts/
+layer-zero/=lib/LayerZero/contracts/
