@@ -2,7 +2,7 @@
 pragma solidity ^0.8.17;
 
 import { stdStorage, StdStorage } from "forge-std/Test.sol";
-import "../BaseTest.test.sol";
+import "../BaseTest.t.sol";
 import { MockToken } from "contracts/mock/MockToken.sol";
 import { MockFlashLoanReceiver } from "contracts/mock/MockFlashLoanReceiver.sol";
 import { MockCoreBorrow, ICoreBorrow } from "contracts/mock/MockCoreBorrow.sol";

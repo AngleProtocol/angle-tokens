@@ -2,7 +2,7 @@
 pragma solidity ^0.8.17;
 
 import { stdStorage, StdStorage } from "forge-std/Test.sol";
-import "../BaseTest.test.sol";
+import "../BaseTest.t.sol";
 import { IAgToken, AgToken } from "contracts/agToken/AgToken.sol";
 import { MockTreasury } from "contracts/mock/MockTreasury.sol";
 

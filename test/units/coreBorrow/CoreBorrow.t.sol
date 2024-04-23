@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import "../BaseTest.test.sol";
+import "../BaseTest.t.sol";
 import { CoreBorrow, ICoreBorrow } from "contracts/coreBorrow/CoreBorrow.sol";
 import { MockTreasury } from "contracts/mock/MockTreasury.sol";
 import { IAgToken } from "contracts/interfaces/IAgToken.sol";

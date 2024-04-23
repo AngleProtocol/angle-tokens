@@ -6,11 +6,11 @@ import "forge-std/Script.sol";
 import { StdAssertions } from "forge-std/Test.sol";
 import { stdJson } from "forge-std/StdJson.sol";
 import "stringutils/strings.sol";
-
 import "./Constants.s.sol";
+
 import { TransparentUpgradeableProxy } from "oz/proxy/transparent/TransparentUpgradeableProxy.sol";
 
-import { ImmutableCreate2Factory } from "../../../contracts/interfaces/external/create2/ImmutableCreate2Factory.sol";
+import { ImmutableCreate2Factory } from "contracts/interfaces/external/create2/ImmutableCreate2Factory.sol";
 
 /// @dev Script to run to find the init code of a contract to get a vanity address from it
 contract FindInitCode is Script, StdAssertions {

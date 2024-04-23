@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import "../BaseTest.test.sol";
+import "../BaseTest.t.sol";
 import { MockTreasury } from "contracts/mock/MockTreasury.sol";
 import { AgTokenSideChainMultiBridge } from "contracts/agToken/AgTokenSideChainMultiBridge.sol";
 import { MockToken } from "contracts/mock/MockToken.sol";
