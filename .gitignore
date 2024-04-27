@@ -1,14 +1,53 @@
-# Compiler files
-cache/
-out/
-
-# Ignores development broadcast logs
-!/broadcast
-/broadcast/*/31337/
-/broadcast/**/dry-run/
-
-# Docs
-docs/
-
-# Dotenv file
+## Defaults
+__pycache__
+.idea
+.DS_Store
+.deps
+.docs
 .env
+node_modules
+tenderly.yaml
+settings.json
+venv
+
+# Build output
+/cache
+/cache-hh
+build
+export
+**/artifacts
+.openzeppelin
+lcov.info
+docgen/docs
+docgen/SUMMARY.md
+solidity-flattenedContracts
+./crytic-export
+typechain
+slither-audit.txt
+slither
+
+# Test output
+coverage
+coverage.json
+
+# Running output
+gas-report.txt
+gasReporterOutput.json
+addresses.json
+blockchain_db
+ganache*
+yarn-error.log
+
+# deployments
+deployments/localhost
+deployments/mainnetForkRemote
+
+# bin
+bin
+
+# temporary delete
+typechain/cacheIndex.ts
+
+# foundry
+/out
+/cache-forge
