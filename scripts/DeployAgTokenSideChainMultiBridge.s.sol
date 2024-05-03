@@ -31,6 +31,20 @@ contract DeployAgTokenSideChainMultiBridge is Script, CommonUtils {
 
         vm.startBroadcast(deployerPrivateKey);
 
+        AgTokenSideChainMultiBridge agTokenImpl = new AgTokenSideChainMultiBridge();
+        console.log("AgTokenSideChainMultiBridge Implementation deployed at", address(agTokenImpl));
+
+        AgTokenSideChainMultiBridge angleProxy = AgTokenSideChainMultiBridge(
+            ImmutableCreate2Factory(IMMUTABLE_CREATE2_FACTORY_ADDRESS).safeCreate2(
+                salt,
+                abi.encodePacked(
+                    type(TransparentUpgradeableProxy).creationCode,
+                    abi.encode(address(agTokenImpl), deployer, "")
+                )
+            )
+        );
+        console.log("AgTokenSideChainMultiBridge Proxy deployed at", address(angleProxy));
+
         Treasury treasuryImpl = new Treasury();
         console.log("Treasury Implementation deployed at", address(treasuryImpl));
 
@@ -39,29 +53,11 @@ contract DeployAgTokenSideChainMultiBridge is Script, CommonUtils {
                 _deployUpgradeable(
                     proxyAdmin,
                     address(treasuryImpl),
-                    abi.encodeWithSelector(
-                        Treasury.initialize.selector,
-                        coreBorrow,
-                        ImmutableCreate2Factory(IMMUTABLE_CREATE2_FACTORY_ADDRESS).findCreate2Address(
-                            salt,
-                            type(AgTokenSideChainMultiBridge).creationCode
-                        )
-                    )
+                    abi.encodeWithSelector(Treasury.initialize.selector, coreBorrow, address(angleProxy))
                 )
             )
         );
         console.log("Treasury Proxy deployed at", address(treasuryProxy));
-
-        AgTokenSideChainMultiBridge agTokenImpl = new AgTokenSideChainMultiBridge();
-        console.log("AgTokenSideChainMultiBridge Implementation deployed at", address(agTokenImpl));
-
-        AgTokenSideChainMultiBridge angleProxy = AgTokenSideChainMultiBridge(
-            ImmutableCreate2Factory(IMMUTABLE_CREATE2_FACTORY_ADDRESS).safeCreate2(
-                salt,
-                type(AgTokenSideChainMultiBridge).creationCode
-            )
-        );
-        console.log("AgTokenSideChainMultiBridge Proxy deployed at", address(angleProxy));
 
         angleProxy.initialize(
             string.concat("Angle ag", stableName),
