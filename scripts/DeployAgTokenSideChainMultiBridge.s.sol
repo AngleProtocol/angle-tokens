@@ -59,11 +59,7 @@ contract DeployAgTokenSideChainMultiBridge is Script, CommonUtils {
         );
         console.log("Treasury Proxy deployed at", address(treasuryProxy));
 
-        angleProxy.initialize(
-            string.concat("Angle ag", stableName),
-            string.concat("ag", stableName),
-            address(treasuryProxy)
-        );
+        angleProxy.initialize(string.concat(stableName, "A"), string.concat(stableName, "A"), address(treasuryProxy));
 
         LayerZeroBridgeToken lzImpl = new LayerZeroBridgeToken();
         console.log("LayerZeroBridgeToken Implementation deployed at", address(lzImpl));
@@ -74,8 +70,8 @@ contract DeployAgTokenSideChainMultiBridge is Script, CommonUtils {
                     address(lzImpl),
                     abi.encodeWithSelector(
                         LayerZeroBridgeToken.initialize.selector,
-                        string.concat("LayerZero Bridge ag", stableName),
-                        string.concat("LZ-ag", stableName),
+                        string.concat("LayerZero Bridge ", stableName, "A"),
+                        string.concat("LZ-", stableName, "A"),
                         address(lzEndpoint),
                         address(treasuryProxy),
                         0
