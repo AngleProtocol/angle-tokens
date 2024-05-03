@@ -10,8 +10,10 @@ contract DeployChain is Script, CommonUtils {
     function run() external {
         uint256 chainId = vm.envUint("CHAIN_ID");
 
-        address governor = _chainToContract(chainId, ContractType.GovernorMultisig);
-        address guardian = _chainToContract(chainId, ContractType.GuardianMultisig);
+        /** TODO  complete */
+        address governor = vm.envOr("GOVERNOR", _chainToContract(chainId, ContractType.GovernorMultisig));
+        address guardian = vm.envOr("GUARDIAN", _chainToContract(chainId, ContractType.GuardianMultisig));
+        /** END  complete */
 
         uint256 deployerPrivateKey = vm.deriveKey(vm.envString("MNEMONIC_MAINNET"), "m/44'/60'/0'/0/", 0);
         vm.startBroadcast(deployerPrivateKey);
