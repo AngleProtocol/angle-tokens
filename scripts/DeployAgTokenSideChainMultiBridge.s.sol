@@ -52,8 +52,8 @@ contract DeployAgTokenSideChainMultiBridge is Script, CommonUtils {
         );
         console.log("Treasury Proxy deployed at", address(treasuryProxy));
 
-        AgTokenSideChainMultiBridge angleImpl = new AgTokenSideChainMultiBridge();
-        console.log("AgTokenSideChainMultiBridge Implementation deployed at", address(angleImpl));
+        AgTokenSideChainMultiBridge agTokenImpl = new AgTokenSideChainMultiBridge();
+        console.log("AgTokenSideChainMultiBridge Implementation deployed at", address(agTokenImpl));
 
         AgTokenSideChainMultiBridge angleProxy = AgTokenSideChainMultiBridge(
             ImmutableCreate2Factory(IMMUTABLE_CREATE2_FACTORY_ADDRESS).safeCreate2(
