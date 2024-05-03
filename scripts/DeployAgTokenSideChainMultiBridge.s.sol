@@ -42,20 +42,18 @@ contract DeployAgTokenSideChainMultiBridge is Script, CommonUtils {
         ImmutableCreate2Factory create2Factory = ImmutableCreate2Factory(IMMUTABLE_CREATE2_FACTORY_ADDRESS);
         bytes memory initCode = abi.encodePacked(
             type(TransparentUpgradeableProxy).creationCode,
-            abi.encode(address(agTokenImpl), proxyAdmin, "")
+            abi.encode(IMMUTABLE_CREATE2_FACTORY_ADDRESS, deployer, "")
         );
         address computedAddress = create2Factory.findCreate2Address(salt, initCode);
         console.log("AgTokenSideChainMultiBridge Proxy Supposed to deploy: %s", computedAddress);
 
-        if (computedAddress != expectedAddress) {
-            console.log("Computed address: %s does not match expected address: %s", computedAddress, expectedAddress);
-            vm.stopBroadcast();
-            return;
-        }
+        require(computedAddress == expectedAddress, "Computed address does not match expected address");
 
         AgTokenSideChainMultiBridge angleProxy = AgTokenSideChainMultiBridge(
             create2Factory.safeCreate2(salt, initCode)
         );
+        TransparentUpgradeableProxy(payable(address(angleProxy))).upgradeTo(address(agTokenImpl));
+        TransparentUpgradeableProxy(payable(address(angleProxy))).changeAdmin(proxyAdmin);
         console.log("AgTokenSideChainMultiBridge Proxy deployed at", address(angleProxy));
 
         Treasury treasuryImpl = new Treasury();
