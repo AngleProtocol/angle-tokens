@@ -11,12 +11,12 @@ contract DeployTokenSideChainMultiBridge is Script, CommonUtils {
     function run() external {
         /** TODO  complete */
         string memory chainName = vm.envString("CHAIN_NAME");
-        string memory symbol = vm.envString("SYMBOL");
         uint256 totalLimit = vm.envUint("TOTAL_LIMIT");
         uint256 hourlyLimit = vm.envUint("HOURLY_LIMIT");
         uint256 chainTotalHourlyLimit = vm.envUint("CHAIN_TOTAL_HOURLY_LIMIT");
         /** END  complete */
 
+        string memory symbol = "ANGLE";
         uint256 chainId = vm.envUint("CHAIN_ID");
         uint256 deployerPrivateKey = vm.deriveKey(vm.envString("MNEMONIC_MAINNET"), "m/44'/60'/0'/0/", 0);
         vm.startBroadcast(deployerPrivateKey);
