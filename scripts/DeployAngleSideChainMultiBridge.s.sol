@@ -14,6 +14,7 @@ contract DeployTokenSideChainMultiBridge is Script, CommonUtils {
         uint256 totalLimit = vm.envUint("TOTAL_LIMIT");
         uint256 hourlyLimit = vm.envUint("HOURLY_LIMIT");
         uint256 chainTotalHourlyLimit = vm.envUint("CHAIN_TOTAL_HOURLY_LIMIT");
+        bool mock = vm.envOr("MOCK", false);
         /** END  complete */
 
         string memory symbol = "ANGLE";
@@ -63,6 +64,19 @@ contract DeployTokenSideChainMultiBridge is Script, CommonUtils {
             false,
             chainTotalHourlyLimit
         );
+
+        if (mock) {
+            (uint256[] memory chainIds, address[] memory contracts) = _getConnectedChains("ANGLE");
+
+            // Set trusted remote from current chain
+            for (uint256 i = 0; i < contracts.length; i++) {
+                if (chainIds[i] == chainId) {
+                    continue;
+                }
+
+                lzProxy.setTrustedRemote(_getLZChainId(chainIds[i]), abi.encodePacked(contracts[i], address(lzProxy)));
+            }
+        }
 
         vm.stopBroadcast();
     }

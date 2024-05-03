@@ -18,6 +18,10 @@ contract DeployAgTokenSideChainMultiBridge is Script, CommonUtils {
         /** TODO  complete */
         string memory stableName = vm.envString("STABLE_NAME");
         address expectedAddress = vm.envAddress("EXPECTED_ADDRESS");
+        uint256 totalLimit = vm.envUint("TOTAL_LIMIT");
+        uint256 hourlyLimit = vm.envUint("HOURLY_LIMIT");
+        uint256 chainTotalHourlyLimit = vm.envUint("CHAIN_TOTAL_HOURLY_LIMIT");
+        bool mock = vm.envOr("MOCK", false);
         /** END  complete */
 
         uint256 deployerPrivateKey = vm.deriveKey(vm.envString("MNEMONIC_MAINNET"), "m/44'/60'/0'/0/", 0);
@@ -89,6 +93,23 @@ contract DeployAgTokenSideChainMultiBridge is Script, CommonUtils {
             )
         );
         console.log("LayerZeroBridgeToken Proxy deployed at", address(lzProxy));
+
+        if (mock) {
+            angleProxy.addBridgeToken(address(lzProxy), totalLimit, hourlyLimit, 0, false);
+            angleProxy.setChainTotalHourlyLimit(chainTotalHourlyLimit);
+            LayerZeroBridgeToken(address(lzProxy)).setUseCustomAdapterParams(1);
+
+            (uint256[] memory chainIds, address[] memory contracts) = _getConnectedChains(stableName);
+
+            // Set trusted remote from current chain
+            for (uint256 i = 0; i < contracts.length; i++) {
+                if (chainIds[i] == chainId) {
+                    continue;
+                }
+
+                lzProxy.setTrustedRemote(_getLZChainId(chainIds[i]), abi.encodePacked(contracts[i], address(lzProxy)));
+            }
+        }
 
         vm.stopBroadcast();
     }
