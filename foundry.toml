@@ -61,6 +61,7 @@ depth = 1
 fail_on_revert = false
 
 [profile.ci]
+optimizer = true
 src = "test"
 via_ir = false
 gas_reports = ["*"]
