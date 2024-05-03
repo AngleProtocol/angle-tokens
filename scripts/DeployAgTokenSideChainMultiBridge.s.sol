@@ -17,6 +17,7 @@ contract DeployAgTokenSideChainMultiBridge is Script, CommonUtils {
     function run() external {
         /** TODO  complete */
         string memory stableName = vm.envString("STABLE_NAME");
+        address expectedAddress = vm.envAddress("EXPECTED_ADDRESS");
         /** END  complete */
 
         uint256 deployerPrivateKey = vm.deriveKey(vm.envString("MNEMONIC_MAINNET"), "m/44'/60'/0'/0/", 0);
@@ -34,14 +35,22 @@ contract DeployAgTokenSideChainMultiBridge is Script, CommonUtils {
         AgTokenSideChainMultiBridge agTokenImpl = new AgTokenSideChainMultiBridge();
         console.log("AgTokenSideChainMultiBridge Implementation deployed at", address(agTokenImpl));
 
+        ImmutableCreate2Factory create2Factory = ImmutableCreate2Factory(IMMUTABLE_CREATE2_FACTORY_ADDRESS);
+        bytes memory initCode = abi.encodePacked(
+            type(TransparentUpgradeableProxy).creationCode,
+            abi.encode(address(agTokenImpl), proxyAdmin, "")
+        );
+        address computedAddress = create2Factory.findCreate2Address(salt, initCode);
+        console.log("AgTokenSideChainMultiBridge Proxy Supposed to deploy: %s", computedAddress);
+
+        if (computedAddress != expectedAddress) {
+            console.log("Computed address: %s does not match expected address: %s", computedAddress, expectedAddress);
+            vm.stopBroadcast();
+            return;
+        }
+
         AgTokenSideChainMultiBridge angleProxy = AgTokenSideChainMultiBridge(
-            ImmutableCreate2Factory(IMMUTABLE_CREATE2_FACTORY_ADDRESS).safeCreate2(
-                salt,
-                abi.encodePacked(
-                    type(TransparentUpgradeableProxy).creationCode,
-                    abi.encode(address(agTokenImpl), deployer, "")
-                )
-            )
+            create2Factory.safeCreate2(salt, initCode)
         );
         console.log("AgTokenSideChainMultiBridge Proxy deployed at", address(angleProxy));
 
