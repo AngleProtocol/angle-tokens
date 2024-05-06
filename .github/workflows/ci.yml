@@ -221,7 +221,7 @@ jobs:
           version: nightly
 
       - name: Compile foundry
-        run: forge clean && forge build --build-info --force --skip "script" "test"
+        run: forge clean && forge build --build-info --force --skip "*/test/**" "*/scripts/**"
 
       - name: "Run Slither analysis"
         uses: "crytic/slither-action@v0.3.2"
@@ -230,7 +230,6 @@ jobs:
           ignore-compile: true
           fail-on: "none"
           sarif: "results.sarif"
-          slither-version: "0.10.1"
 
       - name: "Upload SARIF file to GitHub code scanning"
         uses: "github/codeql-action/upload-sarif@v2"
