@@ -25,8 +25,9 @@ contract DeployAgTokenSideChainMultiBridge is Script, CommonUtils {
 
         uint256 deployerPrivateKey = vm.deriveKey(vm.envString("MNEMONIC_MAINNET"), "m/44'/60'/0'/0/", 0);
         address deployer = vm.addr(deployerPrivateKey);
-        string memory jsonVanity = vm.readFile(JSON_VANITY_PATH);
-        bytes32 salt = bytes32(abi.encodePacked(deployer, abi.encodePacked(uint96(jsonVanity.readUint("$.init")))));
+        string memory jsonVanity = vm.readFile(string.concat(JSON_VANITY_PATH, stableName, ".json"));
+        bytes32 salt = jsonVanity.readBytes32("$.salt");
+        bytes memory initCode = jsonVanity.readBytes("$.initCode");
         uint256 chainId = vm.envUint("CHAIN_ID");
 
         string memory json = vm.readFile(JSON_ADDRESSES_PATH);
@@ -50,10 +51,6 @@ contract DeployAgTokenSideChainMultiBridge is Script, CommonUtils {
         console.log("AgTokenSideChainMultiBridge Implementation deployed at", address(agTokenImpl));
 
         ImmutableCreate2Factory create2Factory = ImmutableCreate2Factory(IMMUTABLE_CREATE2_FACTORY_ADDRESS);
-        bytes memory initCode = abi.encodePacked(
-            type(TransparentUpgradeableProxy).creationCode,
-            abi.encode(IMMUTABLE_CREATE2_FACTORY_ADDRESS, deployer, "")
-        );
         address computedAddress = create2Factory.findCreate2Address(salt, initCode);
         console.log("AgTokenSideChainMultiBridge Proxy Supposed to deploy: %s", computedAddress);
 
@@ -118,8 +115,8 @@ contract DeployAgTokenSideChainMultiBridge is Script, CommonUtils {
 
             // add real governor
             address realGovernor = vm.envOr("REAL_GOVERNOR", _chainToContract(chainId, ContractType.GovernorMultisig));
-            coreBorrow.addGovernor(realGovernor);
-            coreBorrow.removeGovernor(deployer);
+            ICoreBorrow(coreBorrow).addGovernor(realGovernor);
+            ICoreBorrow(coreBorrow).removeGovernor(deployer);
         }
 
         string memory json2 = "output";

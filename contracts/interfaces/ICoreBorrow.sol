@@ -25,4 +25,16 @@ interface ICoreBorrow {
     /// @dev Governance should make sure when adding a governor to also give this governor the guardian
     /// role by calling the `addGovernor` function
     function isGovernorOrGuardian(address admin) external view returns (bool);
+
+    /// @notice Adds a governor in the protocol
+    /// @param governor Address to grant the role to
+    /// @dev It is necessary to call this function to grant a governor role to make sure
+    /// all governors also have the guardian role
+    function addGovernor(address governor) external;
+
+    /// @notice Revokes a governor from the protocol
+    /// @param governor Address to remove the role to
+    /// @dev It is necessary to call this function to remove a governor role to make sure
+    /// the address also loses its guardian role
+    function removeGovernor(address governor) external;
 }
