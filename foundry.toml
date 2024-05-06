@@ -48,7 +48,6 @@ bsc = { key = "${BSC_ETHERSCAN_API_KEY}"}
 
 [profile.dev]
 optimizer = true
-via_ir = false
 src = "test"
 gas_reports = ["*"]
 
@@ -63,7 +62,6 @@ fail_on_revert = false
 [profile.ci]
 optimizer = true
 src = "test"
-via_ir = false
 gas_reports = ["*"]
 
 [profile.ci.fuzz]
