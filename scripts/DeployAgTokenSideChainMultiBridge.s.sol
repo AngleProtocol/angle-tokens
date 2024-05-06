@@ -57,7 +57,7 @@ contract DeployAgTokenSideChainMultiBridge is Script, CommonUtils {
         address computedAddress = create2Factory.findCreate2Address(salt, initCode);
         console.log("AgTokenSideChainMultiBridge Proxy Supposed to deploy: %s", computedAddress);
 
-        // require(computedAddress == expectedAddress, "Computed address does not match expected address");
+        require(computedAddress == expectedAddress, "Computed address does not match expected address");
 
         AgTokenSideChainMultiBridge agToken = AgTokenSideChainMultiBridge(create2Factory.safeCreate2(salt, initCode));
         TransparentUpgradeableProxy(payable(address(agToken))).upgradeTo(address(agTokenImpl));
