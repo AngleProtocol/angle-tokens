@@ -221,7 +221,7 @@ jobs:
           version: nightly
 
       - name: Compile foundry
-        run: forge clean && forge build --build-info --force
+        run: forge clean && forge build --build-info --force --skip "script" "test"
 
       - name: "Run Slither analysis"
         uses: "crytic/slither-action@v0.3.2"
