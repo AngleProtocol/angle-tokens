@@ -21,9 +21,6 @@ contract DeployChain is Script, CommonUtils {
         ProxyAdmin proxyAdmin = new ProxyAdmin();
         console.log("ProxyAdmin deployed at", address(proxyAdmin));
 
-        ProxyAdmin proxyAdminGuadian = new ProxyAdmin();
-        console.log("ProxyAdminGuadian deployed at", address(proxyAdminGuadian));
-
         CoreBorrow coreBorrowImpl = new CoreBorrow();
         console.log("CoreBorrow Implementation deployed at", address(coreBorrowImpl));
 
