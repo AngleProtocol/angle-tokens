@@ -6,6 +6,7 @@ import "./utils/Constants.s.sol";
 import "utils/src/CommonUtils.sol";
 import { TokenSideChainMultiBridge } from "contracts/agToken/TokenSideChainMultiBridge.sol";
 import { LayerZeroBridgeTokenERC20 } from "contracts/agToken/layerZero/LayerZeroBridgeTokenERC20.sol";
+import { ImmutableCreate2Factory } from "contracts/interfaces/external/create2/ImmutableCreate2Factory.sol";
 import { ICoreBorrow } from "contracts/interfaces/ICoreBorrow.sol";
 
 contract DeployAngleSideChainMultiBridge is Script, CommonUtils {
@@ -14,15 +15,20 @@ contract DeployAngleSideChainMultiBridge is Script, CommonUtils {
     function run() external {
         /** TODO  complete */
         string memory chainName = vm.envString("CHAIN_NAME");
+        address expectedAddress = vm.envAddress("EXPECTED_ADDRESS");
         uint256 totalLimit = vm.envUint("TOTAL_LIMIT");
         uint256 hourlyLimit = vm.envUint("HOURLY_LIMIT");
         uint256 chainTotalHourlyLimit = vm.envUint("CHAIN_TOTAL_HOURLY_LIMIT");
         bool mock = vm.envOr("MOCK", false);
         /** END  complete */
 
-        string memory symbol = "ANGLE";
-        uint256 chainId = vm.envUint("CHAIN_ID");
         uint256 deployerPrivateKey = vm.deriveKey(vm.envString("MNEMONIC_MAINNET"), "m/44'/60'/0'/0/", 0);
+        address deployer = vm.addr(deployerPrivateKey);
+        string memory symbol = "ANGLE";
+        string memory jsonVanity = vm.readFile(string.concat(JSON_VANITY_PATH, "ANGLE", ".json"));
+        bytes32 salt = jsonVanity.readBytes32("$.salt");
+        bytes memory initCode = jsonVanity.readBytes("$.initCode");
+        uint256 chainId = vm.envUint("CHAIN_ID");
         vm.startBroadcast(deployerPrivateKey);
 
         string memory json = vm.readFile(JSON_ADDRESSES_PATH);
@@ -42,9 +48,16 @@ contract DeployAngleSideChainMultiBridge is Script, CommonUtils {
 
         TokenSideChainMultiBridge angleImpl = new TokenSideChainMultiBridge();
         console.log("TokenSideChainMultiBridge Implementation deployed at", address(angleImpl));
-        TokenSideChainMultiBridge angleProxy = TokenSideChainMultiBridge(
-            address(_deployUpgradeable(proxyAdmin, address(angleImpl), ""))
-        );
+
+        ImmutableCreate2Factory create2Factory = ImmutableCreate2Factory(IMMUTABLE_CREATE2_FACTORY_ADDRESS);
+        address computedAddress = create2Factory.findCreate2Address(salt, initCode);
+        console.log("TokenSideChainMultiBridge Proxy Supposed to deploy: %s", computedAddress);
+
+        require(computedAddress == expectedAddress, "Computed address does not match expected address");
+
+        TokenSideChainMultiBridge angleProxy = TokenSideChainMultiBridge(create2Factory.safeCreate2(salt, initCode));
+        TransparentUpgradeableProxy(payable(address(angleProxy))).upgradeTo(address(angleImpl));
+        TransparentUpgradeableProxy(payable(address(angleProxy))).changeAdmin(proxyAdmin);
         console.log("TokenSideChainMultiBridge Proxy deployed at", address(angleProxy));
 
         LayerZeroBridgeTokenERC20 lzImpl = new LayerZeroBridgeTokenERC20();
