@@ -128,6 +128,7 @@ contract DeployAgTokenSideChainMultiBridge is Script, CommonUtils {
             json2.serialize(keys[i], json.readAddress(string.concat(".", keys[i])));
         }
         json2.serialize("agToken", address(agToken));
+        json2.serialize("treasury", address(treasuryProxy));
         json2 = json2.serialize("lzAgToken", address(lzProxy));
         json2.write(JSON_ADDRESSES_PATH);
 
