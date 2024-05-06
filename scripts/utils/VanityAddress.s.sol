@@ -13,10 +13,6 @@ import "./Constants.s.sol";
 contract VanityAddressScript is Script, VanityAddress {
     using stdJson for string;
 
-    string constant JSON_VANITY_PATH = "./scripts/vanity.json";
-
-    using stdJson for string;
-
     function run() external {
         // Deploy diamond
         bytes

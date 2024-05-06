@@ -2,12 +2,15 @@
 pragma solidity ^0.8.12;
 
 import "forge-std/Script.sol";
+import "./utils/Constants.s.sol";
 import "utils/src/CommonUtils.sol";
 import { TokenSideChainMultiBridge } from "contracts/agToken/TokenSideChainMultiBridge.sol";
-import { LayerZeroBridgeToken } from "contracts/agToken/layerZero/LayerZeroBridgeToken.sol";
+import { LayerZeroBridgeTokenERC20 } from "contracts/agToken/layerZero/LayerZeroBridgeTokenERC20.sol";
 import { ICoreBorrow } from "contracts/interfaces/ICoreBorrow.sol";
 
-contract DeployTokenSideChainMultiBridge is Script, CommonUtils {
+contract DeployAngleSideChainMultiBridge is Script, CommonUtils {
+    using stdJson for string;
+
     function run() external {
         /** TODO  complete */
         string memory chainName = vm.envString("CHAIN_NAME");
@@ -22,8 +25,19 @@ contract DeployTokenSideChainMultiBridge is Script, CommonUtils {
         uint256 deployerPrivateKey = vm.deriveKey(vm.envString("MNEMONIC_MAINNET"), "m/44'/60'/0'/0/", 0);
         vm.startBroadcast(deployerPrivateKey);
 
-        address proxyAdmin = _chainToContract(chainId, ContractType.ProxyAdmin);
-        address coreBorrow = _chainToContract(chainId, ContractType.CoreBorrow);
+        string memory json = vm.readFile(JSON_ADDRESSES_PATH);
+        address proxyAdmin;
+        address coreBorrow;
+        if (vm.keyExistsJson(json, ".proxyAdmin")) {
+            proxyAdmin = vm.parseJsonAddress(json, ".proxyAdmin");
+        } else {
+            proxyAdmin = _chainToContract(chainId, ContractType.ProxyAdmin);
+        }
+        if (vm.keyExistsJson(json, ".coreBorrow")) {
+            coreBorrow = vm.parseJsonAddress(json, ".coreBorrow");
+        } else {
+            coreBorrow = _chainToContract(chainId, ContractType.CoreBorrow);
+        }
         ILayerZeroEndpoint lzEndpoint = _lzEndPoint(chainId);
 
         TokenSideChainMultiBridge angleImpl = new TokenSideChainMultiBridge();
@@ -33,25 +47,26 @@ contract DeployTokenSideChainMultiBridge is Script, CommonUtils {
         );
         console.log("TokenSideChainMultiBridge Proxy deployed at", address(angleProxy));
 
-        LayerZeroBridgeToken lzImpl = new LayerZeroBridgeToken();
-        console.log("LayerZeroBridgeToken Implementation deployed at", address(lzImpl));
-        LayerZeroBridgeToken lzProxy = LayerZeroBridgeToken(
+        LayerZeroBridgeTokenERC20 lzImpl = new LayerZeroBridgeTokenERC20();
+        console.log("LayerZeroBridgeTokenERC20 Implementation deployed at", address(lzImpl));
+        LayerZeroBridgeTokenERC20 lzProxy = LayerZeroBridgeTokenERC20(
             address(
                 _deployUpgradeable(
                     proxyAdmin,
                     address(lzImpl),
                     abi.encodeWithSelector(
-                        LayerZeroBridgeToken.initialize.selector,
+                        LayerZeroBridgeTokenERC20.initialize.selector,
                         string.concat("LayerZero Bridge ", symbol),
                         string.concat("LZ-", symbol),
                         lzEndpoint,
                         coreBorrow,
-                        address(angleProxy)
+                        address(angleProxy),
+                        0
                     )
                 )
             )
         );
-        console.log("LayerZeroBridgeToken Proxy deployed at", address(lzProxy));
+        console.log("LayerZeroBridgeTokenERC20 Proxy deployed at", address(lzProxy));
 
         angleProxy.initialize(
             string.concat(symbol, "_", chainName),
@@ -76,7 +91,18 @@ contract DeployTokenSideChainMultiBridge is Script, CommonUtils {
 
                 lzProxy.setTrustedRemote(_getLZChainId(chainIds[i]), abi.encodePacked(contracts[i], address(lzProxy)));
             }
+
+            // TODO add real governor
         }
+
+        string memory json2 = "output";
+        string[] memory keys = vm.parseJsonKeys(json, "");
+        for (uint256 i = 0; i < keys.length; i++) {
+            json2.serialize(keys[i], json.readAddress(string.concat(".", keys[i])));
+        }
+        json2.serialize("angle", address(angleProxy));
+        json2 = json2.serialize("lzAngle", address(lzProxy));
+        json2.write(JSON_ADDRESSES_PATH);
 
         vm.stopBroadcast();
     }

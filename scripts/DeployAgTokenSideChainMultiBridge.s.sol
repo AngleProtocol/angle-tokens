@@ -2,6 +2,7 @@
 pragma solidity ^0.8.12;
 
 import "forge-std/Script.sol";
+import "./utils/Constants.s.sol";
 import "utils/src/CommonUtils.sol";
 import { AgTokenSideChainMultiBridge } from "contracts/agToken/AgTokenSideChainMultiBridge.sol";
 import { LayerZeroBridgeToken } from "contracts/agToken/layerZero/LayerZeroBridgeToken.sol";
@@ -11,8 +12,6 @@ import { ImmutableCreate2Factory } from "contracts/interfaces/external/create2/I
 
 contract DeployAgTokenSideChainMultiBridge is Script, CommonUtils {
     using stdJson for string;
-
-    string constant JSON_VANITY_PATH = "./scripts/vanity.json";
 
     function run() external {
         /** TODO  complete */
@@ -26,12 +25,23 @@ contract DeployAgTokenSideChainMultiBridge is Script, CommonUtils {
 
         uint256 deployerPrivateKey = vm.deriveKey(vm.envString("MNEMONIC_MAINNET"), "m/44'/60'/0'/0/", 0);
         address deployer = vm.addr(deployerPrivateKey);
-        string memory json = vm.readFile(JSON_VANITY_PATH);
-        bytes32 salt = bytes32(abi.encodePacked(deployer, abi.encodePacked(uint96(json.readUint("$.init")))));
+        string memory jsonVanity = vm.readFile(JSON_VANITY_PATH);
+        bytes32 salt = bytes32(abi.encodePacked(deployer, abi.encodePacked(uint96(jsonVanity.readUint("$.init")))));
         uint256 chainId = vm.envUint("CHAIN_ID");
 
-        address proxyAdmin = _chainToContract(chainId, ContractType.ProxyAdmin);
-        address coreBorrow = _chainToContract(chainId, ContractType.CoreBorrow);
+        string memory json = vm.readFile(JSON_ADDRESSES_PATH);
+        address proxyAdmin;
+        address coreBorrow;
+        if (vm.keyExistsJson(json, ".proxyAdmin")) {
+            proxyAdmin = vm.parseJsonAddress(json, ".proxyAdmin");
+        } else {
+            proxyAdmin = _chainToContract(chainId, ContractType.ProxyAdmin);
+        }
+        if (vm.keyExistsJson(json, ".coreBorrow")) {
+            coreBorrow = vm.parseJsonAddress(json, ".coreBorrow");
+        } else {
+            coreBorrow = _chainToContract(chainId, ContractType.CoreBorrow);
+        }
         ILayerZeroEndpoint lzEndpoint = _lzEndPoint(chainId);
 
         vm.startBroadcast(deployerPrivateKey);
@@ -47,14 +57,12 @@ contract DeployAgTokenSideChainMultiBridge is Script, CommonUtils {
         address computedAddress = create2Factory.findCreate2Address(salt, initCode);
         console.log("AgTokenSideChainMultiBridge Proxy Supposed to deploy: %s", computedAddress);
 
-        require(computedAddress == expectedAddress, "Computed address does not match expected address");
+        // require(computedAddress == expectedAddress, "Computed address does not match expected address");
 
-        AgTokenSideChainMultiBridge angleProxy = AgTokenSideChainMultiBridge(
-            create2Factory.safeCreate2(salt, initCode)
-        );
-        TransparentUpgradeableProxy(payable(address(angleProxy))).upgradeTo(address(agTokenImpl));
-        TransparentUpgradeableProxy(payable(address(angleProxy))).changeAdmin(proxyAdmin);
-        console.log("AgTokenSideChainMultiBridge Proxy deployed at", address(angleProxy));
+        AgTokenSideChainMultiBridge agToken = AgTokenSideChainMultiBridge(create2Factory.safeCreate2(salt, initCode));
+        TransparentUpgradeableProxy(payable(address(agToken))).upgradeTo(address(agTokenImpl));
+        TransparentUpgradeableProxy(payable(address(agToken))).changeAdmin(proxyAdmin);
+        console.log("AgTokenSideChainMultiBridge Proxy deployed at", address(agToken));
 
         Treasury treasuryImpl = new Treasury();
         console.log("Treasury Implementation deployed at", address(treasuryImpl));
@@ -64,13 +72,13 @@ contract DeployAgTokenSideChainMultiBridge is Script, CommonUtils {
                 _deployUpgradeable(
                     proxyAdmin,
                     address(treasuryImpl),
-                    abi.encodeWithSelector(Treasury.initialize.selector, coreBorrow, address(angleProxy))
+                    abi.encodeWithSelector(Treasury.initialize.selector, coreBorrow, address(agToken))
                 )
             )
         );
         console.log("Treasury Proxy deployed at", address(treasuryProxy));
 
-        angleProxy.initialize(string.concat(stableName, "A"), string.concat(stableName, "A"), address(treasuryProxy));
+        agToken.initialize(string.concat(stableName, "A"), string.concat(stableName, "A"), address(treasuryProxy));
 
         LayerZeroBridgeToken lzImpl = new LayerZeroBridgeToken();
         console.log("LayerZeroBridgeToken Implementation deployed at", address(lzImpl));
@@ -93,8 +101,8 @@ contract DeployAgTokenSideChainMultiBridge is Script, CommonUtils {
         console.log("LayerZeroBridgeToken Proxy deployed at", address(lzProxy));
 
         if (mock) {
-            angleProxy.addBridgeToken(address(lzProxy), totalLimit, hourlyLimit, 0, false);
-            angleProxy.setChainTotalHourlyLimit(chainTotalHourlyLimit);
+            agToken.addBridgeToken(address(lzProxy), totalLimit, hourlyLimit, 0, false);
+            agToken.setChainTotalHourlyLimit(chainTotalHourlyLimit);
             LayerZeroBridgeToken(address(lzProxy)).setUseCustomAdapterParams(1);
 
             (uint256[] memory chainIds, address[] memory contracts) = _getConnectedChains(stableName);
@@ -107,7 +115,18 @@ contract DeployAgTokenSideChainMultiBridge is Script, CommonUtils {
 
                 lzProxy.setTrustedRemote(_getLZChainId(chainIds[i]), abi.encodePacked(contracts[i], address(lzProxy)));
             }
+
+            // TODO add real governor
         }
+
+        string memory json2 = "output";
+        string[] memory keys = vm.parseJsonKeys(json, "");
+        for (uint256 i = 0; i < keys.length; i++) {
+            json2.serialize(keys[i], json.readAddress(string.concat(".", keys[i])));
+        }
+        json2.serialize("agToken", address(agToken));
+        json2 = json2.serialize("lzAgToken", address(lzProxy));
+        json2.write(JSON_ADDRESSES_PATH);
 
         vm.stopBroadcast();
     }

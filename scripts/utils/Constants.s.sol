@@ -9,3 +9,5 @@ import "utils/src/Constants.sol";
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
 
 address constant DEPLOYER = 0xfdA462548Ce04282f4B6D6619823a7C64Fdc0185;
+string constant JSON_VANITY_PATH = "scripts/vanity.json";
+string constant JSON_ADDRESSES_PATH = "scripts/addresses.json";

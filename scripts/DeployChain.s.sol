@@ -3,6 +3,7 @@ pragma solidity ^0.8.12;
 
 import "forge-std/Script.sol";
 import "utils/src/CommonUtils.sol";
+import "./utils/Constants.s.sol";
 import { ProxyAdmin } from "contracts/external/ProxyAdmin.sol";
 import { CoreBorrow } from "contracts/coreBorrow/CoreBorrow.sol";
 
@@ -34,6 +35,10 @@ contract DeployChain is Script, CommonUtils {
             )
         );
         console.log("CoreBorrow Proxy deployed at", address(coreBorrowProxy));
+
+        vm.serializeAddress("", "coreBorrow", address(coreBorrowProxy));
+        string memory json = vm.serializeAddress("", "proxyAdmin", address(proxyAdmin));
+        vm.writeJson(json, JSON_ADDRESSES_PATH);
 
         vm.stopBroadcast();
     }
