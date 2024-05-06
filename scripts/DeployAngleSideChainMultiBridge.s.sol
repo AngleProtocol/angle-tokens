@@ -15,7 +15,6 @@ contract DeployAngleSideChainMultiBridge is Script, CommonUtils {
     function run() external {
         /** TODO  complete */
         string memory chainName = vm.envString("CHAIN_NAME");
-        address expectedAddress = vm.envAddress("EXPECTED_ADDRESS");
         uint256 totalLimit = vm.envUint("TOTAL_LIMIT");
         uint256 hourlyLimit = vm.envUint("HOURLY_LIMIT");
         uint256 chainTotalHourlyLimit = vm.envUint("CHAIN_TOTAL_HOURLY_LIMIT");
@@ -45,6 +44,12 @@ contract DeployAngleSideChainMultiBridge is Script, CommonUtils {
             coreBorrow = _chainToContract(chainId, ContractType.CoreBorrow);
         }
         ILayerZeroEndpoint lzEndpoint = _lzEndPoint(chainId);
+        address expectedAddress;
+        if (vm.envExists("EXPECTED_ADDRESS")) {
+            expectedAddress = vm.envAddress("EXPECTED_ADDRESS");
+        } else {
+            // TODO compute the expected address once one of the address has been deployed
+        }
 
         TokenSideChainMultiBridge angleImpl = new TokenSideChainMultiBridge();
         console.log("TokenSideChainMultiBridge Implementation deployed at", address(angleImpl));

@@ -16,7 +16,6 @@ contract DeployAgTokenSideChainMultiBridge is Script, CommonUtils {
     function run() external {
         /** TODO  complete */
         string memory stableName = vm.envString("STABLE_NAME");
-        address expectedAddress = vm.envAddress("EXPECTED_ADDRESS");
         uint256 totalLimit = vm.envUint("TOTAL_LIMIT");
         uint256 hourlyLimit = vm.envUint("HOURLY_LIMIT");
         uint256 chainTotalHourlyLimit = vm.envUint("CHAIN_TOTAL_HOURLY_LIMIT");
@@ -44,6 +43,15 @@ contract DeployAgTokenSideChainMultiBridge is Script, CommonUtils {
             coreBorrow = _chainToContract(chainId, ContractType.CoreBorrow);
         }
         ILayerZeroEndpoint lzEndpoint = _lzEndPoint(chainId);
+        address expectedAddress;
+        if (vm.envExists("EXPECTED_ADDRESS")) {
+            expectedAddress = vm.envAddress("EXPECTED_ADDRESS");
+        } else {
+            // TODO compute the expected address once one of the address has been deployed
+            if (keccak256(abi.encodePacked(stableName)) == keccak256("USD")) {
+                expectedAddress = _chainToContract(CHAIN_ETHEREUM, ContractType.AgUSD);
+            }
+        }
 
         vm.startBroadcast(deployerPrivateKey);
 
