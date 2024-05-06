@@ -92,7 +92,10 @@ contract DeployAngleSideChainMultiBridge is Script, CommonUtils {
                 lzProxy.setTrustedRemote(_getLZChainId(chainIds[i]), abi.encodePacked(contracts[i], address(lzProxy)));
             }
 
-            // TODO add real governor
+            // add real governor
+            address realGovernor = vm.envOr("REAL_GOVERNOR", _chainToContract(chainId, ContractType.GovernorMultisig));
+            coreBorrow.addGovernor(realGovernor);
+            coreBorrow.removeGovernor(deployer);
         }
 
         string memory json2 = "output";
