@@ -230,7 +230,7 @@ jobs:
         run: "python3 -m pip install slither-analyzer"
 
       - name: "Run Slither analysis"
-        run: "slither . --ignore-compile"
+        run: "slither . --ignore-compile --sarif results.sarif --fail-none"
 
       - name: "Run Slither analysis"
         uses: "crytic/slither-action@v0.3.2"
