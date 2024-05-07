@@ -223,17 +223,14 @@ jobs:
       - name: Compile foundry
         run: forge clean && forge build --build-info --force --skip "*/test/**" "*/scripts/**"
 
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-
-      - name: "Install Slither"
-        run: "python3 -m pip install slither-analyzer"
-
-      - name: "Run Slither analysis"
-        run: "slither . --ignore-compile --sarif results.sarif --fail-none"
+      # - name: "Install Slither"
+      #   run: "python3 -m pip install slither-analyzer"
+# 
+      # - name: "Run Slither analysis"
+      #   run: "slither . --ignore-compile --sarif results.sarif --fail-none"
 
       - name: "Run Slither analysis"
-        uses: "crytic/slither-action@v0.3.2"
+        uses: "crytic/slither-action@v0.4.0"
         id: "slither"
         with:
           ignore-compile: true
