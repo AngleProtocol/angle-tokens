@@ -16,9 +16,6 @@ contract DeployAgTokenSideChainMultiBridge is Script, CommonUtils {
     function run() external {
         /** TODO  complete */
         string memory stableName = vm.envString("STABLE_NAME");
-        uint256 totalLimit = vm.envUint("TOTAL_LIMIT");
-        uint256 hourlyLimit = vm.envUint("HOURLY_LIMIT");
-        uint256 chainTotalHourlyLimit = vm.envUint("CHAIN_TOTAL_HOURLY_LIMIT");
         bool mock = vm.envOr("MOCK", false);
         /** END  complete */
 
@@ -112,6 +109,9 @@ contract DeployAgTokenSideChainMultiBridge is Script, CommonUtils {
         console.log("LayerZeroBridgeToken Proxy deployed at", address(lzProxy));
 
         if (mock) {
+            uint256 totalLimit = vm.envUint("TOTAL_LIMIT");
+            uint256 hourlyLimit = vm.envUint("HOURLY_LIMIT");
+            uint256 chainTotalHourlyLimit = vm.envUint("CHAIN_TOTAL_HOURLY_LIMIT");
             agToken.addBridgeToken(address(lzProxy), totalLimit, hourlyLimit, 0, false);
             agToken.setChainTotalHourlyLimit(chainTotalHourlyLimit);
             LayerZeroBridgeToken(address(lzProxy)).setUseCustomAdapterParams(1);
