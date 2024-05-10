@@ -229,13 +229,12 @@ jobs:
       - name: "Run Slither analysis"
         id: slither
         run:
-          slither . --ignore-compile --sarif results.sarif --fail-none |
-          echo "sariff=$(cat results.sarif)" >> "$GITHUB_OUTPUT"
+          slither . --ignore-compile --sarif results.sarif --fail-none && echo "sariff=$(cat results.sarif)" >> "$GITHUB_OUTPUT"
 
       - name: "Upload SARIF file to GitHub code scanning"
         uses: "github/codeql-action/upload-sarif@v2"
         with:
-          sarif_file: ${{ steps.slither.outputs.sariff }}
+          sarif_file: ${{ steps.slither.outputs.sarziff }}
 
       - name: "Add Slither summary"
         run: |
