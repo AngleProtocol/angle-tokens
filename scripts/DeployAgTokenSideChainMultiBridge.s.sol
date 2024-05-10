@@ -29,17 +29,23 @@ contract DeployAgTokenSideChainMultiBridge is Script, CommonUtils {
         bytes memory initCode = jsonVanity.readBytes("$.initCode");
         uint256 chainId = vm.envUint("CHAIN_ID");
 
-        string memory json = vm.readFile(JSON_ADDRESSES_PATH);
+        string memory json;
         address proxyAdmin;
         address coreBorrow;
-        if (vm.keyExistsJson(json, ".proxyAdmin")) {
-            proxyAdmin = vm.parseJsonAddress(json, ".proxyAdmin");
+        if (vm.isFile(JSON_ADDRESSES_PATH)) {
+            json = vm.readFile(JSON_ADDRESSES_PATH);
+            if (vm.keyExistsJson(json, ".proxyAdmin")) {
+                proxyAdmin = vm.parseJsonAddress(json, ".proxyAdmin");
+            } else {
+                proxyAdmin = _chainToContract(chainId, ContractType.ProxyAdmin);
+            }
+            if (vm.keyExistsJson(json, ".coreBorrow")) {
+                coreBorrow = vm.parseJsonAddress(json, ".coreBorrow");
+            } else {
+                coreBorrow = _chainToContract(chainId, ContractType.CoreBorrow);
+            }
         } else {
             proxyAdmin = _chainToContract(chainId, ContractType.ProxyAdmin);
-        }
-        if (vm.keyExistsJson(json, ".coreBorrow")) {
-            coreBorrow = vm.parseJsonAddress(json, ".coreBorrow");
-        } else {
             coreBorrow = _chainToContract(chainId, ContractType.CoreBorrow);
         }
         ILayerZeroEndpoint lzEndpoint = _lzEndPoint(chainId);
@@ -128,9 +134,11 @@ contract DeployAgTokenSideChainMultiBridge is Script, CommonUtils {
         }
 
         string memory json2 = "output";
-        string[] memory keys = vm.parseJsonKeys(json, "");
-        for (uint256 i = 0; i < keys.length; i++) {
-            json2.serialize(keys[i], json.readAddress(string.concat(".", keys[i])));
+        if (vm.isFile(JSON_ADDRESSES_PATH)) {
+            string[] memory keys = vm.parseJsonKeys(json, "");
+            for (uint256 i = 0; i < keys.length; i++) {
+                json2.serialize(keys[i], json.readAddress(string.concat(".", keys[i])));
+            }
         }
         json2.serialize("agToken", address(agToken));
         json2.serialize("treasury", address(treasuryProxy));
