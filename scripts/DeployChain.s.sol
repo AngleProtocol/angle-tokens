@@ -37,6 +37,8 @@ contract DeployChain is Script, CommonUtils {
         console.log("CoreBorrow Proxy deployed at", address(coreBorrowProxy));
 
         vm.serializeAddress("", "coreBorrow", address(coreBorrowProxy));
+        vm.serializeAddress("", "guardian", guardian);
+        vm.serializeAddress("", "governor", governor);
         string memory json = vm.serializeAddress("", "proxyAdmin", address(proxyAdmin));
         vm.writeJson(json, JSON_ADDRESSES_PATH);
 
