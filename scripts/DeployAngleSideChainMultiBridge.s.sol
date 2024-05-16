@@ -117,9 +117,14 @@ contract DeployAngleSideChainMultiBridge is Script, CommonUtils {
             }
 
             // add real governor
-            address realGovernor = vm.envOr("REAL_GOVERNOR", _chainToContract(chainId, ContractType.GovernorMultisig));
-            ICoreBorrow(coreBorrow).addGovernor(realGovernor);
-            ICoreBorrow(coreBorrow).removeGovernor(deployer);
+            if (vm.envBool("FINALIZE")) {
+                address realGovernor = vm.envOr(
+                    "REAL_GOVERNOR",
+                    _chainToContract(chainId, ContractType.GovernorMultisig)
+                );
+                ICoreBorrow(coreBorrow).addGovernor(realGovernor);
+                ICoreBorrow(coreBorrow).removeGovernor(deployer);
+            }
         }
 
         string memory json2 = "output";
