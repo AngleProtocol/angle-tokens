@@ -46,7 +46,6 @@ celo = { key = "${CELO_ETHERSCAN_API_KEY}", url = "https://api.celoscan.io/api" 
 base = { key = "${BASE_ETHERSCAN_API_KEY}", url = "https://api.basescan.org/api" }
 polygonzkevm = { key = "${POLYGONZKEVM_ETHERSCAN_API_KEY}", url = "https://api-zkevm.polygonscan.com/api" }
 bsc = { key = "${BSC_ETHERSCAN_API_KEY}"}
-base = { key = "${BASE_ETHERSCAN_API_KEY}"}
 linea = { key = "${LINEA_ETHERSCAN_API_KEY}"}
 
 [profile.dev]
