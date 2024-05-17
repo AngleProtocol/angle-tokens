@@ -34,6 +34,7 @@ polygonzkevm = "${ETH_NODE_URI_POLYGONZKEVM}"
 bsc = "${ETH_NODE_URI_BSC}"
 base = "${ETH_NODE_URI_BASE}"
 linea = "${ETH_NODE_URI_LINEA}"
+mantle = "${ETH_NODE_URI_MANTLE}"
 
 [etherscan]
 arbitrum = { key = "${ARBITRUM_ETHERSCAN_API_KEY}" }
