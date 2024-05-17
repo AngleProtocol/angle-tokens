@@ -54,6 +54,7 @@ contract DeployAngleSideChainMultiBridge is Script, CommonUtils {
         if (vm.envExists("EXPECTED_ADDRESS")) {
             expectedAddress = vm.envAddress("EXPECTED_ADDRESS");
         } else {
+            expectedAddress = address(0xAaaaAA19ddd491648Db2a31C32f2B2792DeC5015);
             // TODO compute the expected address once one of the address has been deployed
         }
 

@@ -54,6 +54,9 @@ contract DeployAgTokenSideChainMultiBridge is Script, CommonUtils {
             if (keccak256(abi.encodePacked(stableName)) == keccak256("USD")) {
                 expectedAddress = _chainToContract(CHAIN_ETHEREUM, ContractType.AgUSD);
             }
+            if (keccak256(abi.encodePacked(stableName)) == keccak256("EUR")) {
+                expectedAddress = address(0x00001063a5d3A9d5f1B03e848fa788aae1d98C5c);
+            }
         }
 
         vm.startBroadcast(deployerPrivateKey);
