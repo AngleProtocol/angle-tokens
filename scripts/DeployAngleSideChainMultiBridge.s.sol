@@ -94,7 +94,7 @@ contract DeployAngleSideChainMultiBridge is Script, CommonUtils {
         console.log("LayerZeroBridgeTokenERC20 Proxy deployed at", address(lzProxy));
 
         angleProxy.initialize(
-            string.concat(symbol, "_", chainName),
+            symbol,
             symbol,
             ICoreBorrow(coreBorrow),
             address(lzProxy),
