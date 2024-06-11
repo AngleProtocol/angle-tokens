@@ -14,7 +14,6 @@ contract DeployAngleSideChainMultiBridge is Script, CommonUtils {
 
     function run() external {
         /** TODO  complete */
-        string memory chainName = vm.envString("CHAIN_NAME");
         uint256 totalLimit = vm.envUint("TOTAL_LIMIT");
         uint256 hourlyLimit = vm.envUint("HOURLY_LIMIT");
         uint256 chainTotalHourlyLimit = vm.envUint("CHAIN_TOTAL_HOURLY_LIMIT");
@@ -106,6 +105,8 @@ contract DeployAngleSideChainMultiBridge is Script, CommonUtils {
         );
 
         if (mock) {
+            LayerZeroBridgeToken(address(lzProxy)).setUseCustomAdapterParams(1);
+
             (uint256[] memory chainIds, address[] memory contracts) = _getConnectedChains("ANGLE");
 
             // Set trusted remote from current chain
