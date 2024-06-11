@@ -117,7 +117,7 @@ contract DeployAgTokenSideChainMultiBridge is Script, CommonUtils {
             uint256 chainTotalHourlyLimit = vm.envUint("CHAIN_TOTAL_HOURLY_LIMIT");
             agToken.addBridgeToken(address(lzProxy), totalLimit, hourlyLimit, 0, false);
             agToken.setChainTotalHourlyLimit(chainTotalHourlyLimit);
-            LayerZeroBridgeToken(address(lzProxy)).setUseCustomAdapterParams(1);
+            lzProxy.setUseCustomAdapterParams(1);
 
             (uint256[] memory chainIds, address[] memory contracts) = _getConnectedChains(stableName);
 

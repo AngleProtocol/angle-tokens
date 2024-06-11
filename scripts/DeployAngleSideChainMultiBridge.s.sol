@@ -105,7 +105,7 @@ contract DeployAngleSideChainMultiBridge is Script, CommonUtils {
         );
 
         if (mock) {
-            LayerZeroBridgeToken(address(lzProxy)).setUseCustomAdapterParams(1);
+            lzProxy.setUseCustomAdapterParams(1);
 
             (uint256[] memory chainIds, address[] memory contracts) = _getConnectedChains("ANGLE");
 
