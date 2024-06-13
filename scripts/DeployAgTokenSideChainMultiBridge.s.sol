@@ -132,10 +132,6 @@ contract DeployAgTokenSideChainMultiBridge is Script, CommonUtils {
 
             // add real governor
             if (vm.envBool("FINALIZE")) {
-                address realGovernor = vm.envOr(
-                    "REAL_GOVERNOR",
-                    _chainToContract(chainId, ContractType.GovernorMultisig)
-                );
                 ICoreBorrow(coreBorrow).removeGovernor(deployer);
             }
         }
