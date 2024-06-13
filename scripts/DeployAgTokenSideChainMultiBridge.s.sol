@@ -131,7 +131,7 @@ contract DeployAgTokenSideChainMultiBridge is Script, CommonUtils {
             }
 
             // add real governor
-            if (vm.envBool("FINALIZE")) {
+            if (vm.envOr("FINALIZE", false)) {
                 ICoreBorrow(coreBorrow).removeGovernor(deployer);
             }
         }
