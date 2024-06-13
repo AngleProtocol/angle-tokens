@@ -124,7 +124,6 @@ contract DeployAngleSideChainMultiBridge is Script, CommonUtils {
                     "REAL_GOVERNOR",
                     _chainToContract(chainId, ContractType.GovernorMultisig)
                 );
-                ICoreBorrow(coreBorrow).addGovernor(realGovernor);
                 ICoreBorrow(coreBorrow).removeGovernor(deployer);
             }
         }

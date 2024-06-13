@@ -41,6 +41,10 @@ contract DeployChain is Script, CommonUtils {
 
         coreBorrowProxy.addGovernor(timelock);
 
+        if (mock) {
+            coreBorrowProxy.addGovernor(governor);
+        }
+
         proxyAdmin.transferOwnership(governor);
 
         vm.serializeAddress("", "coreBorrow", address(coreBorrowProxy));
