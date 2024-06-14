@@ -58,10 +58,10 @@ contract DeploySavings is Script, CommonUtils {
         } else {
             // TODO compute the expected address once one of the address has been deployed
             if (keccak256(abi.encodePacked(stableName)) == keccak256("USD")) {
-                expectedAddress = _chainToContract(CHAIN_ETHEREUM, ContractType.AgUSD);
+                expectedAddress = _chainToContract(CHAIN_ARBITRUM, ContractType.AgUSD);
             }
             if (keccak256(abi.encodePacked(stableName)) == keccak256("EUR")) {
-                expectedAddress = _chainToContract(CHAIN_ETHEREUM, ContractType.AgEUR);
+                expectedAddress = _chainToContract(CHAIN_ARBITRUM, ContractType.AgEUR);
             }
         }
 
