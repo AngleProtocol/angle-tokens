@@ -20,7 +20,6 @@ contract DeploySavings is Script, CommonUtils {
         /** END  complete */
 
         uint256 deployerPrivateKey = vm.deriveKey(vm.envString("MNEMONIC_MAINNET"), "m/44'/60'/0'/0/", 0);
-        address deployer = vm.addr(deployerPrivateKey);
         string memory jsonVanity = vm.readFile(string.concat(JSON_VANITY_PATH, "Savings", stableName, ".json"));
         bytes32 salt = jsonVanity.readBytes32("$.salt");
         bytes memory initCode = jsonVanity.readBytes("$.initCode");
@@ -58,10 +57,10 @@ contract DeploySavings is Script, CommonUtils {
         } else {
             // TODO compute the expected address once one of the address has been deployed
             if (keccak256(abi.encodePacked(stableName)) == keccak256("USD")) {
-                expectedAddress = _chainToContract(CHAIN_ARBITRUM, ContractType.AgUSD);
+                expectedAddress = _chainToContract(CHAIN_ETHEREUM, ContractType.StUSD);
             }
             if (keccak256(abi.encodePacked(stableName)) == keccak256("EUR")) {
-                expectedAddress = _chainToContract(CHAIN_ARBITRUM, ContractType.AgEUR);
+                expectedAddress = _chainToContract(CHAIN_ETHEREUM, ContractType.StEUR);
             }
         }
 
