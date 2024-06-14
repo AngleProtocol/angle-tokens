@@ -8,6 +8,7 @@ import { TokenSideChainMultiBridge } from "contracts/agToken/TokenSideChainMulti
 import { LayerZeroBridgeTokenERC20 } from "contracts/agToken/layerZero/LayerZeroBridgeTokenERC20.sol";
 import { ImmutableCreate2Factory } from "contracts/interfaces/external/create2/ImmutableCreate2Factory.sol";
 import { ICoreBorrow } from "contracts/interfaces/ICoreBorrow.sol";
+import { Savings, IAccessControlManager, IERC20MetadataUpgradeable } from "transmuter/savings/Savings.sol";
 
 contract DeploySavings is Script, CommonUtils {
     using stdJson for string;
@@ -15,6 +16,7 @@ contract DeploySavings is Script, CommonUtils {
     function run() external {
         /** TODO  complete */
         string memory stableName = vm.envString("STABLE_NAME");
+        ContractType stableType = ContractType.AgEUR;
         /** END  complete */
 
         uint256 deployerPrivateKey = vm.deriveKey(vm.envString("MNEMONIC_MAINNET"), "m/44'/60'/0'/0/", 0);
@@ -43,12 +45,24 @@ contract DeploySavings is Script, CommonUtils {
             if (vm.keyExistsJson(json, ".agToken")) {
                 agToken = vm.parseJsonAddress(json, ".agToken");
             } else {
-                agToken = _chainToContract(chainId, ContractType.AgToken);
+                agToken = _chainToContract(chainId, stableType);
             }
         } else {
             proxyAdmin = _chainToContract(chainId, ContractType.ProxyAdmin);
             coreBorrow = _chainToContract(chainId, ContractType.CoreBorrow);
-            agToken = _chainToContract(chainId, ContractType.AgEUR);
+            agToken = _chainToContract(chainId, stableType);
+        }
+        address expectedAddress;
+        if (vm.envExists("EXPECTED_ADDRESS")) {
+            expectedAddress = vm.envAddress("EXPECTED_ADDRESS");
+        } else {
+            // TODO compute the expected address once one of the address has been deployed
+            if (keccak256(abi.encodePacked(stableName)) == keccak256("USD")) {
+                expectedAddress = _chainToContract(CHAIN_ETHEREUM, ContractType.AgUSD);
+            }
+            if (keccak256(abi.encodePacked(stableName)) == keccak256("EUR")) {
+                expectedAddress = _chainToContract(CHAIN_ETHEREUM, ContractType.AgEUR);
+            }
         }
 
         vm.startBroadcast(deployerPrivateKey);
@@ -83,7 +97,7 @@ contract DeploySavings is Script, CommonUtils {
                 json2.serialize(keys[i], json.readAddress(string.concat(".", keys[i])));
             }
         }
-        json2.serialize("stAgToken", address(angleProxy));
+        json2.serialize("stAgToken", address(saving));
         json2.write(JSON_ADDRESSES_PATH);
 
         vm.stopBroadcast();

@@ -7,3 +7,5 @@ utils/=lib/utils/
 contracts/=contracts/
 chainlink/=lib/chainlink/contracts/
 layer-zero/=lib/LayerZero/contracts/
+transmuter/=lib/angle-transmuter/contracts/
+test/=test/
