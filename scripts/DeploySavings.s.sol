@@ -96,7 +96,7 @@ contract DeploySavings is Script, CommonUtils {
                 json2.serialize(keys[i], json.readAddress(string.concat(".", keys[i])));
             }
         }
-        json2.serialize("stAgToken", address(saving));
+        json2 = json2.serialize("stToken", address(saving));
         json2.write(JSON_ADDRESSES_PATH);
 
         vm.stopBroadcast();
