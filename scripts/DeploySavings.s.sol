@@ -16,8 +16,15 @@ contract DeploySavings is Script, CommonUtils {
     function run() external {
         /** TODO  complete */
         string memory stableName = vm.envString("STABLE_NAME");
-        ContractType stableType = ContractType.AgEUR;
         /** END  complete */
+
+        ContractType stableType;
+        if (keccak256(abi.encodePacked(stableName)) == keccak256("USD")) {
+            stableType = ContractType.AgUSD;
+        }
+        if (keccak256(abi.encodePacked(stableName)) == keccak256("EUR")) {
+            stableType = ContractType.AgEUR;
+        }
 
         uint256 deployerPrivateKey = vm.deriveKey(vm.envString("MNEMONIC_MAINNET"), "m/44'/60'/0'/0/", 0);
         string memory jsonVanity = vm.readFile(string.concat(JSON_VANITY_PATH, "Savings", stableName, ".json"));
