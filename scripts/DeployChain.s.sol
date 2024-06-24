@@ -13,9 +13,22 @@ contract DeployChain is Script, CommonUtils {
 
         /** TODO  complete */
         bool mock = vm.envOr("MOCK", false);
-        address timelock = vm.envOr("TIMELOCK", _chainToContract(chainId, ContractType.Timelock));
-        address governor = vm.envOr("GOVERNOR", _chainToContract(chainId, ContractType.GovernorMultisig));
-        address guardian = vm.envOr("GUARDIAN", _chainToContract(chainId, ContractType.GuardianMultisig));
+        address timelock;
+        if (vm.envExists("TIMELOCK")) {
+            timelock = vm.envAddress("TIMELOCK");
+        } else {
+            timelock = _chainToContract(chainId, ContractType.Timelock);
+        }
+        if (vm.envExists("GOVERNOR")) {
+            address governor = vm.envAddress("GOVERNOR");
+        } else {
+            address governor = _chainToContract(chainId, ContractType.GovernorMultisig);
+        }
+        if (vm.envExists("GUARDIAN")) {
+            address guardian = vm.envAddress("GUARDIAN");
+        } else {
+            address guardian = _chainToContract(chainId, ContractType.GuardianMultisig);
+        }
         /** END  complete */
 
         uint256 deployerPrivateKey = vm.deriveKey(vm.envString("MNEMONIC_MAINNET"), "m/44'/60'/0'/0/", 0);
