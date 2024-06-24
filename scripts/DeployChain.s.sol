@@ -14,6 +14,8 @@ contract DeployChain is Script, CommonUtils {
         /** TODO  complete */
         bool mock = vm.envOr("MOCK", false);
         address timelock;
+        address governor;
+        address guardian;
         if (vm.envExists("TIMELOCK")) {
             timelock = vm.envAddress("TIMELOCK");
         } else {
