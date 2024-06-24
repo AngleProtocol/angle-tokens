@@ -50,4 +50,12 @@ contract MockCoreBorrow is ICoreBorrow {
     function setFlashLoanModule(ITreasury _treasury, address _flashLoanModule) external {
         _treasury.setFlashLoanModule(_flashLoanModule);
     }
+
+    function addGovernor(address governor) external override {
+        governors[governor] = true;
+    }
+
+    function removeGovernor(address governor) external override {
+        governors[governor] = false;
+    }
 }

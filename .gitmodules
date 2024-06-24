@@ -16,3 +16,6 @@
 [submodule "lib/LayerZero"]
 	path = lib/LayerZero
 	url = https://github.com/LayerZero-Labs/LayerZero
+[submodule "lib/angle-transmuter"]
+	path = lib/angle-transmuter
+	url = https://github.com/AngleProtocol/angle-transmuter

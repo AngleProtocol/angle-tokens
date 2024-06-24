@@ -221,20 +221,20 @@ jobs:
           version: nightly
 
       - name: Compile foundry
-        run: forge clean && forge build --build-info --force
+        run: forge clean && forge build --build-info --force --skip "*/test/**" "*/scripts/**"
+
+      - name: "Install Slither"
+        run: "python3 -m pip install slither-analyzer"
 
       - name: "Run Slither analysis"
-        uses: "crytic/slither-action@v0.3.2"
-        id: "slither"
-        with:
-          ignore-compile: true
-          fail-on: "none"
-          sarif: "results.sarif"
+        id: slither
+        run:
+          slither . --ignore-compile --sarif results.sarif --fail-none
 
       - name: "Upload SARIF file to GitHub code scanning"
         uses: "github/codeql-action/upload-sarif@v2"
         with:
-          sarif_file: ${{ steps.slither.outputs.sarif }}
+          sarif_file: results.sarif
 
       - name: "Add Slither summary"
         run: |
