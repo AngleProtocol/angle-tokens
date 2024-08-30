@@ -37,6 +37,7 @@ linea = "${ETH_NODE_URI_LINEA}"
 mantle = "${ETH_NODE_URI_MANTLE}"
 mode = "${ETH_NODE_URI_MODE}"
 blast = "${ETH_NODE_URI_BLAST}"
+xlayer = "${ETH_NODE_URI_XLAYER}"
 
 [etherscan]
 arbitrum = { key = "${ARBITRUM_ETHERSCAN_API_KEY}" }
