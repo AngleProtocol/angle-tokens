@@ -22,14 +22,14 @@ contract DeployChain is Script, CommonUtils {
             timelock = _chainToContract(chainId, ContractType.Timelock);
         }
         if (vm.envExists("GOVERNOR")) {
-            address governor = vm.envAddress("GOVERNOR");
+            governor = vm.envAddress("GOVERNOR");
         } else {
-            address governor = _chainToContract(chainId, ContractType.GovernorMultisig);
+            governor = _chainToContract(chainId, ContractType.GovernorMultisig);
         }
         if (vm.envExists("GUARDIAN")) {
-            address guardian = vm.envAddress("GUARDIAN");
+            guardian = vm.envAddress("GUARDIAN");
         } else {
-            address guardian = _chainToContract(chainId, ContractType.GuardianMultisig);
+            guardian = _chainToContract(chainId, ContractType.GuardianMultisig);
         }
         /** END  complete */
 
